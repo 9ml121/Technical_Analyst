@@ -1,0 +1,235 @@
+# 量化投资系统默认配置
+# 这是系统的基础配置，会被环境特定配置覆盖
+
+# 系统基础配置
+system:
+  name: "量化投资系统"
+  version: "0.1.0"
+  environment: "development"
+  debug: true
+  timezone: "Asia/Shanghai"
+
+# 日志配置
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
+  file: "system.log"
+  dir: "logs"
+  max_file_size: 10485760  # 10MB
+  backup_count: 5
+  console: true
+
+# 数据库配置
+database:
+  type: "sqlite"
+  path: "data/quant_system.db"
+  backup_enabled: true
+  backup_interval: 86400  # 24小时
+  connection_pool_size: 5
+
+# 数据源配置
+data_sources:
+  # 东方财富API (免费，无需token)
+  eastmoney:
+    enabled: true
+    base_url: "http://82.push2.eastmoney.com/api/qt"
+    timeout: 10
+    retry_count: 3
+    retry_delay: 1
+    rate_limit: 100  # 每分钟请求数限制
+  
+  # Tushare API (需要token)
+  tushare:
+    enabled: false
+    token: ""  # 从环境变量获取
+    timeout: 30
+    retry_count: 3
+    retry_delay: 2
+    rate_limit: 200
+  
+  # Yahoo Finance (备用数据源)
+  yfinance:
+    enabled: false
+    timeout: 15
+    retry_count: 2
+    retry_delay: 1
+
+# 回测配置
+backtest:
+  # 基础设置
+  initial_capital: 1000000.0  # 初始资金
+  start_date: "2023-01-01"
+  end_date: "2024-01-01"
+  
+  # 交易设置
+  max_positions: 5  # 最大持仓数量
+  position_size_pct: 0.20  # 单只股票仓位比例
+  
+  # 费用设置
+  commission_rate: 0.0003  # 手续费率
+  stamp_tax_rate: 0.001    # 印花税率(卖出时)
+  slippage_rate: 0.001     # 滑点率
+  min_commission: 5.0      # 最小手续费
+  
+  # 风控设置
+  stop_loss_pct: 0.05      # 止损比例
+  stop_profit_pct: 0.20    # 止盈比例
+  max_drawdown: 0.10       # 最大回撤限制
+  
+  # 基准设置
+  benchmark: "000300.SH"   # 沪深300指数
+
+# 策略配置
+strategy:
+  # 默认选股条件
+  selection_criteria:
+    consecutive_days: 3
+    min_total_return: 0.15
+    max_drawdown: 0.05
+    exclude_limit_up_first_day: true
+    
+    # 价格筛选
+    min_stock_price: 5.0
+    max_stock_price: 200.0
+    min_market_cap: 1000000000  # 10亿
+    max_market_cap: 500000000000  # 5000亿
+    
+    # 成交量筛选
+    min_avg_volume: 10000000  # 1000万
+    min_turnover_rate: 0.01   # 1%
+    max_turnover_rate: 0.20   # 20%
+    
+    # 技术指标
+    enable_technical: false
+    rsi_min: 30
+    rsi_max: 70
+    require_macd_golden_cross: false
+    require_ma_bullish: false
+    
+    # 基本面筛选
+    enable_fundamental: false
+    min_roe: 0.10  # 10%
+    max_pe_ratio: 30
+    min_revenue_growth: 0.05  # 5%
+    max_debt_ratio: 0.60  # 60%
+    
+    # 行业筛选
+    excluded_industries: []
+    included_sectors: []
+    exclude_new_stocks: true
+    new_stock_days_limit: 60
+
+# 风险管理配置
+risk_management:
+  # 仓位管理
+  max_single_position: 0.20  # 单只股票最大仓位
+  max_sector_exposure: 0.40  # 单个行业最大敞口
+  cash_reserve_ratio: 0.05   # 现金储备比例
+  
+  # 风险指标
+  max_portfolio_volatility: 0.20  # 组合最大波动率
+  max_correlation: 0.70      # 持仓股票最大相关性
+  var_confidence: 0.95       # VaR置信度
+  
+  # 止损设置
+  enable_stop_loss: true
+  stop_loss_method: "percentage"  # percentage, atr, volatility
+  trailing_stop: false
+  stop_loss_buffer: 0.02     # 止损缓冲
+
+# 数据处理配置
+data_processing:
+  # 数据清洗
+  remove_outliers: true
+  outlier_method: "iqr"  # iqr, zscore, isolation_forest
+  outlier_threshold: 3.0
+  
+  # 数据验证
+  validate_prices: true
+  validate_volumes: true
+  validate_ratios: true
+  
+  # 缓存设置
+  enable_cache: true
+  cache_ttl: 3600  # 1小时
+  cache_size: 1000  # 最大缓存条目数
+
+# 性能配置
+performance:
+  # 并发设置
+  max_workers: 4
+  enable_multiprocessing: false
+  
+  # 内存管理
+  max_memory_usage: 2147483648  # 2GB
+  gc_threshold: 1000
+  
+  # 计算优化
+  use_numba: false
+  use_cython: false
+
+# 通知配置
+notifications:
+  # 邮件通知
+  email:
+    enabled: false
+    smtp_server: ""
+    smtp_port: 587
+    username: ""
+    password: ""
+    recipients: []
+  
+  # 微信通知
+  wechat:
+    enabled: false
+    webhook_url: ""
+  
+  # 钉钉通知
+  dingtalk:
+    enabled: false
+    webhook_url: ""
+    secret: ""
+
+# 监控配置
+monitoring:
+  # 系统监控
+  enable_system_monitor: true
+  monitor_interval: 60  # 秒
+  
+  # 性能监控
+  enable_performance_monitor: true
+  performance_log_interval: 300  # 5分钟
+  
+  # 健康检查
+  health_check_interval: 30
+  health_check_timeout: 5
+
+# 安全配置
+security:
+  # API安全
+  enable_api_key: false
+  api_key_header: "X-API-Key"
+  
+  # 数据加密
+  encrypt_sensitive_data: false
+  encryption_key: ""
+  
+  # 访问控制
+  enable_ip_whitelist: false
+  ip_whitelist: []
+
+# 开发配置
+development:
+  # 调试设置
+  enable_debug_mode: true
+  debug_sql: false
+  debug_api_calls: false
+  
+  # 测试设置
+  enable_test_mode: false
+  test_data_path: "tests/fixtures"
+  mock_api_calls: false
+  
+  # 开发工具
+  enable_profiler: false
+  enable_memory_profiler: false

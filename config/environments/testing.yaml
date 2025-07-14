@@ -1,0 +1,155 @@
+# 测试环境配置
+# 用于自动化测试和CI/CD流程
+
+# 系统配置
+system:
+  name: "量化投资系统"
+  version: "0.1.0"
+  environment: "testing"
+  debug: false
+
+# 日志配置 - 测试环境使用简化日志
+logging:
+  level: "WARNING"
+  console: false
+  file: "testing.log"
+  dir: "tests/logs"
+
+# 数据库配置 - 测试环境使用内存数据库
+database:
+  type: "sqlite"
+  path: ":memory:" # 内存数据库，测试完成后自动清理
+  backup_enabled: false
+  connection_pool_size: 1
+
+# 数据源配置 - 测试环境使用模拟数据
+data_sources:
+  eastmoney:
+    enabled: false # 测试环境不使用真实API
+
+  tushare:
+    enabled: false
+
+  yfinance:
+    enabled: false
+
+  # 测试专用的模拟数据源
+  mock:
+    enabled: true
+    data_path: "tests/fixtures/mock_data.json"
+
+# 回测配置 - 测试环境使用固定的测试参数
+backtest:
+  initial_capital: 50000.0 # 5万用于测试
+  start_date: "2024-01-01"
+  end_date: "2024-03-01" # 短期测试
+  max_positions: 2
+  commission_rate: 0.0003
+  stamp_tax_rate: 0.001
+  slippage_rate: 0.001
+
+# 策略配置 - 测试环境使用预定义的测试策略
+strategy:
+  selection_criteria:
+    consecutive_days: 1 # 最小值便于测试
+    min_total_return: 0.05
+    max_drawdown: 0.10
+    min_stock_price: 1.0
+    max_stock_price: 1000.0
+    min_market_cap: 100000000 # 1亿
+    enable_technical: false # 测试环境简化技术指标
+    enable_fundamental: false
+
+# 风险管理 - 测试环境使用严格的风险控制
+risk_management:
+  max_single_position: 0.25
+  max_sector_exposure: 0.40
+  enable_stop_loss: true
+  stop_loss_method: "percentage"
+
+# 数据处理 - 测试环境启用所有验证
+data_processing:
+  remove_outliers: true
+  validate_prices: true
+  validate_volumes: true
+  validate_ratios: true
+  enable_cache: false # 测试环境不使用缓存
+
+# 性能配置 - 测试环境使用最小资源
+performance:
+  max_workers: 1
+  enable_multiprocessing: false
+  max_memory_usage: 536870912 # 512MB
+
+# 通知配置 - 测试环境关闭所有通知
+notifications:
+  email:
+    enabled: false
+  wechat:
+    enabled: false
+  dingtalk:
+    enabled: false
+
+# 监控配置 - 测试环境最小化监控
+monitoring:
+  enable_system_monitor: false
+  enable_performance_monitor: false
+  health_check_interval: 60
+
+# 安全配置 - 测试环境关闭安全功能
+security:
+  enable_api_key: false
+  encrypt_sensitive_data: false
+  enable_ip_whitelist: false
+
+# 测试专用配置
+testing:
+  # 测试数据
+  use_mock_data: true
+  mock_data_path: "tests/fixtures"
+  test_data_size: "small" # small, medium, large
+
+  # 测试行为
+  fail_fast: true
+  verbose_output: false
+  capture_logs: true
+
+  # 性能测试
+  enable_performance_tests: false
+  performance_threshold: 1.0 # 秒
+
+  # 覆盖率
+  enable_coverage: true
+  coverage_threshold: 0.85
+
+  # 并行测试
+  parallel_tests: false
+  test_timeout: 30 # 秒
+
+  # 测试环境清理
+  cleanup_after_tests: true
+  preserve_test_data: false
+
+# 持续集成配置
+ci:
+  # 构建设置
+  build_timeout: 600 # 10分钟
+  enable_parallel_build: false
+
+  # 测试设置
+  run_unit_tests: true
+  run_integration_tests: true
+  run_performance_tests: false
+
+  # 质量检查
+  run_linting: true
+  run_type_checking: true
+  run_security_scan: false
+
+  # 报告
+  generate_test_report: true
+  generate_coverage_report: true
+
+  # 通知
+  notify_on_failure: false
+  notify_on_success: false

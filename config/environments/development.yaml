@@ -1,0 +1,119 @@
+# 开发环境配置
+# 覆盖默认配置中的开发环境特定设置
+
+# 系统配置
+system:
+  name: "量化投资系统"
+  version: "0.1.0"
+  environment: "development"
+  debug: true
+
+# 日志配置 - 开发环境使用更详细的日志
+logging:
+  level: "DEBUG"
+  console: true
+  file: "development.log"
+
+# 数据库配置 - 开发环境使用本地数据库
+database:
+  path: "data/dev_quant_system.db"
+  backup_enabled: false
+
+# 数据源配置 - 开发环境启用更多数据源用于测试
+data_sources:
+  eastmoney:
+    enabled: true
+    rate_limit: 50 # 开发环境降低请求频率
+
+  tushare:
+    enabled: true # 开发环境可以启用（如果有token）
+    rate_limit: 100
+
+  yfinance:
+    enabled: true # 开发环境启用备用数据源
+
+# 回测配置 - 开发环境使用较小的资金和较短的时间范围
+backtest:
+  initial_capital: 100000.0 # 10万用于开发测试
+  start_date: "2024-01-01"
+  end_date: "2024-06-01"
+  max_positions: 3 # 减少持仓数量便于调试
+
+# 策略配置 - 开发环境使用宽松的筛选条件
+strategy:
+  selection_criteria:
+    consecutive_days: 2 # 降低连续天数要求
+    min_total_return: 0.10 # 降低收益率要求
+    min_stock_price: 3.0 # 降低最小股价
+    max_stock_price: 100.0
+    min_market_cap: 500000000 # 5亿
+    enable_technical: true # 开发环境启用技术指标测试
+    enable_fundamental: true # 开发环境启用基本面测试
+
+# 风险管理 - 开发环境使用宽松的风险控制
+risk_management:
+  max_single_position: 0.30 # 允许更大的单只股票仓位
+  max_sector_exposure: 0.50
+  enable_stop_loss: false # 开发环境可以关闭止损便于测试
+
+# 数据处理 - 开发环境启用所有处理功能
+data_processing:
+  remove_outliers: true
+  validate_prices: true
+  validate_volumes: true
+  validate_ratios: true
+  enable_cache: false # 开发环境关闭缓存确保数据实时性
+
+# 性能配置 - 开发环境使用较少资源
+performance:
+  max_workers: 2
+  enable_multiprocessing: false
+  max_memory_usage: 1073741824 # 1GB
+
+# 通知配置 - 开发环境关闭通知
+notifications:
+  email:
+    enabled: false
+  wechat:
+    enabled: false
+  dingtalk:
+    enabled: false
+
+# 监控配置 - 开发环境启用详细监控
+monitoring:
+  enable_system_monitor: true
+  monitor_interval: 30 # 更频繁的监控
+  enable_performance_monitor: true
+  performance_log_interval: 60 # 1分钟
+
+# 开发配置 - 启用所有开发工具
+development:
+  enable_debug_mode: true
+  debug_sql: true
+  debug_api_calls: true
+  enable_test_mode: false
+  mock_api_calls: false # 开发环境使用真实API
+  enable_profiler: true
+  enable_memory_profiler: true
+
+# 开发环境特有配置
+dev_tools:
+  # 热重载
+  enable_hot_reload: true
+  watch_directories: ["src", "config"]
+
+  # 代码质量检查
+  enable_linting: true
+  enable_type_checking: true
+
+  # 测试配置
+  auto_run_tests: false
+  test_coverage_threshold: 0.80
+
+  # 调试工具
+  enable_debugger: true
+  debugger_port: 5678
+
+  # API测试
+  enable_api_docs: true
+  api_docs_port: 8080

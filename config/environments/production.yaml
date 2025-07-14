@@ -1,0 +1,192 @@
+# 生产环境配置
+# 用于实际的量化交易系统部署
+
+# 系统配置
+system:
+  name: "量化投资系统"
+  version: "0.1.0"
+  environment: "production"
+  debug: false
+
+# 日志配置 - 生产环境使用结构化日志
+logging:
+  level: "INFO"
+  console: false # 生产环境不输出到控制台
+  file: "production.log"
+  dir: "/var/log/quant_system" # 标准日志目录
+  max_file_size: 52428800 # 50MB
+  backup_count: 10
+
+# 数据库配置 - 生产环境使用持久化数据库
+database:
+  type: "sqlite" # 可以升级为PostgreSQL或MySQL
+  path: "/data/quant_system/production.db"
+  backup_enabled: true
+  backup_interval: 21600 # 6小时备份一次
+  connection_pool_size: 10
+
+# 数据源配置 - 生产环境使用稳定的数据源
+data_sources:
+  eastmoney:
+    enabled: true
+    timeout: 15 # 生产环境增加超时时间
+    retry_count: 5
+    retry_delay: 2
+    rate_limit: 80 # 保守的请求频率
+
+  tushare:
+    enabled: true # 生产环境启用专业数据源
+    timeout: 30
+    retry_count: 3
+    retry_delay: 3
+    rate_limit: 150
+
+  yfinance:
+    enabled: false # 生产环境关闭不稳定的数据源
+
+# 回测配置 - 生产环境使用实际交易参数
+backtest:
+  initial_capital: 1000000.0 # 100万实际资金
+  start_date: "2023-01-01"
+  end_date: "2024-12-31"
+  max_positions: 10 # 生产环境支持更多持仓
+
+  # 实际交易费用
+  commission_rate: 0.0003
+  stamp_tax_rate: 0.001
+  slippage_rate: 0.002 # 生产环境考虑更大滑点
+  min_commission: 5.0
+
+# 策略配置 - 生产环境使用严格的选股条件
+strategy:
+  selection_criteria:
+    consecutive_days: 5 # 更严格的连续天数要求
+    min_total_return: 0.20 # 更高的收益率要求
+    max_drawdown: 0.03 # 更严格的回撤控制
+    exclude_limit_up_first_day: true
+
+    # 严格的价格筛选
+    min_stock_price: 8.0
+    max_stock_price: 150.0
+    min_market_cap: 5000000000 # 50亿
+    max_market_cap: 300000000000 # 3000亿
+
+    # 严格的成交量要求
+    min_avg_volume: 50000000 # 5000万
+    min_turnover_rate: 0.02
+    max_turnover_rate: 0.15
+
+    # 启用技术指标
+    enable_technical: true
+    rsi_min: 35
+    rsi_max: 65
+    require_macd_golden_cross: true
+    require_ma_bullish: true
+
+    # 启用基本面筛选
+    enable_fundamental: true
+    min_roe: 0.15 # 15%
+    max_pe_ratio: 25
+    min_revenue_growth: 0.10 # 10%
+    max_debt_ratio: 0.50
+
+    # 行业筛选
+    excluded_industries: ["房地产", "钢铁", "煤炭"]
+    exclude_new_stocks: true
+    new_stock_days_limit: 90
+
+# 风险管理 - 生产环境使用严格的风险控制
+risk_management:
+  max_single_position: 0.15 # 单只股票最大15%
+  max_sector_exposure: 0.30 # 单个行业最大30%
+  cash_reserve_ratio: 0.10 # 保持10%现金储备
+
+  max_portfolio_volatility: 0.15
+  max_correlation: 0.60
+  var_confidence: 0.99 # 99%置信度
+
+  enable_stop_loss: true
+  stop_loss_method: "atr" # 使用ATR止损
+  trailing_stop: true
+  stop_loss_buffer: 0.01
+
+# 数据处理 - 生产环境启用所有数据质量控制
+data_processing:
+  remove_outliers: true
+  outlier_method: "isolation_forest"
+  validate_prices: true
+  validate_volumes: true
+  validate_ratios: true
+  enable_cache: true
+  cache_ttl: 1800 # 30分钟缓存
+  cache_size: 5000
+
+# 性能配置 - 生产环境优化性能
+performance:
+  max_workers: 8
+  enable_multiprocessing: true
+  max_memory_usage: 4294967296 # 4GB
+  gc_threshold: 5000
+  use_numba: true # 生产环境启用性能优化
+
+# 通知配置 - 生产环境启用关键通知
+notifications:
+  email:
+    enabled: true
+    smtp_server: "smtp.example.com"
+    smtp_port: 587
+    recipients: ["admin@example.com", "trader@example.com"]
+
+  dingtalk:
+    enabled: true
+    # webhook_url 从环境变量获取
+
+# 监控配置 - 生产环境全面监控
+monitoring:
+  enable_system_monitor: true
+  monitor_interval: 60
+  enable_performance_monitor: true
+  performance_log_interval: 300
+  health_check_interval: 30
+  health_check_timeout: 10
+
+# 安全配置 - 生产环境启用安全功能
+security:
+  enable_api_key: true
+  encrypt_sensitive_data: true
+  enable_ip_whitelist: true
+  ip_whitelist: ["192.168.1.0/24", "10.0.0.0/8"]
+
+# 生产环境特有配置
+production:
+  # 部署配置
+  deployment_mode: "standalone" # standalone, cluster
+  service_port: 8000
+  worker_processes: 4
+
+  # 备份配置
+  enable_data_backup: true
+  backup_schedule: "0 2 * * *" # 每天凌晨2点备份
+  backup_retention_days: 30
+
+  # 监控告警
+  enable_alerts: true
+  alert_thresholds:
+    cpu_usage: 0.80
+    memory_usage: 0.85
+    disk_usage: 0.90
+    error_rate: 0.05
+
+  # 故障恢复
+  enable_auto_recovery: true
+  max_recovery_attempts: 3
+  recovery_delay: 300 # 5分钟
+
+  # 性能优化
+  enable_connection_pooling: true
+  enable_query_cache: true
+  enable_result_compression: true
+
+  # 审计日志
+  enable_audit_log: true
+  audit_log_retention_days: 90

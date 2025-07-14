@@ -1,0 +1,309 @@
+# 动量策略配置
+# 基于股价动量的选股和交易策略
+
+# 策略基本信息
+strategy_info:
+  name: "动量策略"
+  version: "1.0.0"
+  description: "基于股价连续上涨的动量选股策略"
+  author: "量化投资系统"
+  created_date: "2024-01-01"
+  last_modified: "2024-01-01"
+  strategy_type: "momentum"
+
+# 选股条件
+selection_criteria:
+  # 基础条件
+  basic_criteria:
+    consecutive_days: 3  # 连续上涨天数
+    min_total_return: 0.15  # 最小总收益率 15%
+    max_drawdown: 0.05  # 最大回撤 5%
+    exclude_limit_up_first_day: true  # 排除首日涨停
+    
+  # 价格筛选
+  price_filters:
+    min_stock_price: 5.0   # 最小股价 5元
+    max_stock_price: 200.0 # 最大股价 200元
+    min_market_cap: 1000000000    # 最小市值 10亿
+    max_market_cap: 500000000000  # 最大市值 5000亿
+    
+  # 成交量筛选
+  volume_filters:
+    min_avg_volume: 10000000  # 最小平均成交额 1000万
+    min_turnover_rate: 0.01   # 最小换手率 1%
+    max_turnover_rate: 0.20   # 最大换手率 20%
+    volume_ratio_threshold: 1.5  # 成交量放大倍数
+    
+  # 技术指标筛选
+  technical_filters:
+    enable_technical: true
+    
+    # RSI指标
+    rsi:
+      enabled: true
+      period: 14
+      min_value: 30
+      max_value: 70
+      
+    # MACD指标
+    macd:
+      enabled: true
+      fast_period: 12
+      slow_period: 26
+      signal_period: 9
+      require_golden_cross: true
+      
+    # 移动平均线
+    moving_averages:
+      enabled: true
+      require_ma_bullish: true  # 要求均线多头排列
+      ma_periods: [5, 10, 20, 60]
+      price_above_ma: [5, 10]  # 价格必须在MA5和MA10之上
+      
+    # 布林带
+    bollinger_bands:
+      enabled: false
+      period: 20
+      std_dev: 2
+      position_requirement: "middle_to_upper"
+      
+    # 成交量指标
+    volume_indicators:
+      enabled: true
+      volume_ma_period: 20
+      volume_ratio_min: 1.2  # 成交量比均量放大20%
+      
+  # 基本面筛选
+  fundamental_filters:
+    enable_fundamental: true
+    
+    # 盈利能力
+    profitability:
+      min_roe: 0.10      # ROE >= 10%
+      min_roa: 0.05      # ROA >= 5%
+      min_gross_margin: 0.20  # 毛利率 >= 20%
+      min_net_margin: 0.05    # 净利率 >= 5%
+      
+    # 成长性
+    growth:
+      min_revenue_growth: 0.05    # 营收增长率 >= 5%
+      min_profit_growth: 0.10     # 利润增长率 >= 10%
+      max_revenue_growth: 1.0     # 营收增长率 <= 100%
+      
+    # 估值
+    valuation:
+      max_pe_ratio: 30      # PE <= 30
+      max_pb_ratio: 5       # PB <= 5
+      max_ps_ratio: 10      # PS <= 10
+      min_pe_ratio: 5       # PE >= 5 (排除异常值)
+      
+    # 财务健康
+    financial_health:
+      max_debt_ratio: 0.60     # 负债率 <= 60%
+      min_current_ratio: 1.0   # 流动比率 >= 1.0
+      min_quick_ratio: 0.5     # 速动比率 >= 0.5
+      
+  # 行业和板块筛选
+  sector_filters:
+    # 排除行业
+    excluded_industries:
+      - "房地产"
+      - "钢铁"
+      - "煤炭"
+      - "有色金属"
+      
+    # 包含板块
+    included_sectors:
+      - "科技"
+      - "医药"
+      - "消费"
+      - "新能源"
+      
+    # 新股筛选
+    new_stock_filter:
+      exclude_new_stocks: true
+      new_stock_days_limit: 60  # 上市60天内为新股
+
+# 交易规则
+trading_rules:
+  # 买入规则
+  buy_rules:
+    - name: "动量确认"
+      description: "确认股票符合动量条件"
+      condition: "consecutive_days >= 3 and total_return >= 0.15"
+      priority: 1
+      enabled: true
+      
+    - name: "技术指标确认"
+      description: "技术指标支持买入"
+      condition: "rsi > 30 and macd_signal == 'golden_cross' and price > ma5"
+      priority: 2
+      enabled: true
+      
+    - name: "成交量确认"
+      description: "成交量放大确认"
+      condition: "volume_ratio > 1.5 and turnover_rate > 0.01"
+      priority: 3
+      enabled: true
+      
+  # 卖出规则
+  sell_rules:
+    - name: "止盈"
+      description: "达到止盈目标"
+      condition: "profit_pct >= 0.20"
+      priority: 1
+      enabled: true
+      
+    - name: "止损"
+      description: "达到止损线"
+      condition: "loss_pct >= 0.05"
+      priority: 1
+      enabled: true
+      
+    - name: "技术指标转弱"
+      description: "技术指标转为看空"
+      condition: "rsi > 70 or macd_signal == 'death_cross'"
+      priority: 2
+      enabled: true
+      
+    - name: "动量消失"
+      description: "连续下跌超过阈值"
+      condition: "consecutive_down_days >= 2"
+      priority: 3
+      enabled: true
+      
+  # 风控规则
+  risk_rules:
+    - name: "单只股票仓位限制"
+      description: "单只股票仓位不超过20%"
+      condition: "position_pct <= 0.20"
+      priority: 1
+      enabled: true
+      
+    - name: "行业集中度限制"
+      description: "单个行业仓位不超过40%"
+      condition: "sector_exposure <= 0.40"
+      priority: 1
+      enabled: true
+      
+    - name: "总仓位限制"
+      description: "总仓位不超过95%"
+      condition: "total_position <= 0.95"
+      priority: 1
+      enabled: true
+
+# 仓位管理
+position_management:
+  # 仓位分配方法
+  allocation_method: "equal_weight"  # equal_weight, risk_parity, momentum_weight
+  
+  # 基础仓位设置
+  base_position_size: 0.20  # 基础仓位20%
+  max_position_size: 0.25   # 最大单只股票仓位25%
+  min_position_size: 0.05   # 最小仓位5%
+  
+  # 动态仓位调整
+  dynamic_sizing:
+    enabled: true
+    momentum_factor: 0.5     # 动量因子权重
+    volatility_factor: 0.3   # 波动率因子权重
+    volume_factor: 0.2       # 成交量因子权重
+    
+  # 仓位调整规则
+  rebalancing:
+    frequency: "weekly"      # daily, weekly, monthly
+    threshold: 0.05          # 仓位偏离5%时调整
+    max_turnover: 0.30       # 最大换手率30%
+
+# 风险管理
+risk_management:
+  # 止损设置
+  stop_loss:
+    method: "percentage"     # percentage, atr, volatility
+    percentage: 0.05         # 5%止损
+    trailing_stop: true      # 启用移动止损
+    trailing_percentage: 0.03 # 移动止损3%
+    
+  # 止盈设置
+  take_profit:
+    method: "percentage"
+    percentage: 0.20         # 20%止盈
+    partial_profit: true     # 分批止盈
+    profit_levels: [0.10, 0.15, 0.20]  # 分批止盈点位
+    
+  # 组合风险控制
+  portfolio_risk:
+    max_drawdown: 0.10       # 最大回撤10%
+    var_limit: 0.05          # VaR限制5%
+    correlation_limit: 0.70   # 持仓相关性限制
+    
+  # 市场风险控制
+  market_risk:
+    market_filter: true      # 启用市场过滤
+    market_trend_period: 20  # 市场趋势判断周期
+    bear_market_threshold: -0.15  # 熊市阈值-15%
+    reduce_position_in_bear: true # 熊市减仓
+
+# 回测参数
+backtest_params:
+  # 回测时间范围
+  start_date: "2023-01-01"
+  end_date: "2024-01-01"
+  
+  # 交易成本
+  commission_rate: 0.0003
+  stamp_tax_rate: 0.001
+  slippage_rate: 0.001
+  
+  # 基准设置
+  benchmark: "000300.SH"   # 沪深300
+  
+  # 调仓频率
+  rebalance_frequency: "weekly"
+  
+  # 其他设置
+  initial_capital: 1000000
+  max_positions: 10
+
+# 策略参数优化
+optimization:
+  # 优化目标
+  objective: "sharpe_ratio"  # sharpe_ratio, total_return, max_drawdown
+  
+  # 参数范围
+  parameter_ranges:
+    consecutive_days: [2, 3, 4, 5]
+    min_total_return: [0.10, 0.15, 0.20, 0.25]
+    stop_loss_pct: [0.03, 0.05, 0.08, 0.10]
+    take_profit_pct: [0.15, 0.20, 0.25, 0.30]
+    
+  # 优化方法
+  method: "grid_search"    # grid_search, random_search, bayesian
+  
+  # 验证设置
+  validation:
+    method: "walk_forward"  # walk_forward, k_fold
+    train_ratio: 0.70
+    test_ratio: 0.30
+
+# 监控和报告
+monitoring:
+  # 实时监控指标
+  realtime_metrics:
+    - "total_return"
+    - "sharpe_ratio"
+    - "max_drawdown"
+    - "win_rate"
+    - "current_positions"
+    
+  # 报告频率
+  reporting:
+    daily_report: true
+    weekly_report: true
+    monthly_report: true
+    
+  # 告警设置
+  alerts:
+    max_drawdown_alert: 0.08  # 回撤超过8%告警
+    position_limit_alert: true
+    strategy_failure_alert: true

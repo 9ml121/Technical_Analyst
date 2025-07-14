@@ -1,0 +1,281 @@
+# 数据源配置文件
+# 定义各种数据源的详细配置和优先级
+
+# 数据源优先级配置
+priority:
+  realtime_data: ["eastmoney", "tushare", "yfinance"]
+  historical_data: ["tushare", "eastmoney", "yfinance"]
+  fundamental_data: ["tushare", "eastmoney"]
+  technical_indicators: ["local_calculation", "tushare"]
+
+# 东方财富API配置
+eastmoney:
+  name: "东方财富"
+  type: "free"
+  description: "免费的A股实时行情数据源"
+  
+  # 基础配置
+  base_url: "http://82.push2.eastmoney.com/api/qt"
+  timeout: 10
+  retry_count: 3
+  retry_delay: 1
+  
+  # 限流配置
+  rate_limit:
+    requests_per_minute: 100
+    requests_per_hour: 5000
+    requests_per_day: 50000
+  
+  # 支持的数据类型
+  supported_data:
+    realtime_quotes: true
+    historical_klines: true
+    stock_info: true
+    market_status: true
+    sector_data: false
+    financial_data: false
+  
+  # API端点配置
+  endpoints:
+    realtime_list: "/clist/get"
+    stock_detail: "/stock/get"
+    historical_kline: "/stock/kline/get"
+    market_overview: "/ulist.np/get"
+  
+  # 请求参数配置
+  default_params:
+    ut: "bd1d9ddb04089700cf9c27f6f7426281"
+    fltt: "2"
+    invt: "2"
+  
+  # 数据字段映射
+  field_mapping:
+    code: "f12"
+    name: "f14"
+    price: "f2"
+    change: "f4"
+    pct_change: "f3"
+    volume: "f5"
+    amount: "f6"
+    open: "f17"
+    high: "f15"
+    low: "f16"
+    pre_close: "f18"
+
+# Tushare API配置
+tushare:
+  name: "Tushare"
+  type: "premium"
+  description: "专业的金融数据服务平台"
+  
+  # 基础配置
+  base_url: "http://api.tushare.pro"
+  token_required: true
+  timeout: 30
+  retry_count: 3
+  retry_delay: 2
+  
+  # 限流配置（根据积分等级调整）
+  rate_limit:
+    requests_per_minute: 200
+    requests_per_hour: 10000
+    daily_points_limit: 10000
+  
+  # 支持的数据类型
+  supported_data:
+    realtime_quotes: true
+    historical_klines: true
+    stock_info: true
+    financial_data: true
+    sector_data: true
+    index_data: true
+    fund_data: true
+    futures_data: true
+    options_data: true
+  
+  # API接口配置
+  interfaces:
+    stock_basic: "stock_basic"
+    daily: "daily"
+    daily_basic: "daily_basic"
+    income: "income"
+    balancesheet: "balancesheet"
+    cashflow: "cashflow"
+    forecast: "forecast"
+    express: "express"
+    dividend: "dividend"
+    fina_indicator: "fina_indicator"
+    fina_audit: "fina_audit"
+    fina_mainbz: "fina_mainbz"
+    trade_cal: "trade_cal"
+    index_basic: "index_basic"
+    index_daily: "index_daily"
+    index_weight: "index_weight"
+  
+  # 数据质量配置
+  data_quality:
+    enable_validation: true
+    max_missing_ratio: 0.05
+    outlier_detection: true
+    consistency_check: true
+
+# Yahoo Finance配置
+yfinance:
+  name: "Yahoo Finance"
+  type: "free"
+  description: "Yahoo财经免费数据源"
+  
+  # 基础配置
+  base_url: "https://query1.finance.yahoo.com"
+  timeout: 15
+  retry_count: 2
+  retry_delay: 1
+  
+  # 限流配置
+  rate_limit:
+    requests_per_minute: 60
+    requests_per_hour: 2000
+  
+  # 支持的数据类型
+  supported_data:
+    realtime_quotes: true
+    historical_klines: true
+    stock_info: true
+    financial_data: true
+    sector_data: false
+  
+  # 市场支持
+  supported_markets:
+    - "US"  # 美股
+    - "HK"  # 港股
+    - "CN"  # A股（有限支持）
+  
+  # 数据格式配置
+  data_format:
+    date_format: "%Y-%m-%d"
+    timezone: "UTC"
+    currency: "USD"
+
+# 本地数据源配置
+local:
+  name: "本地数据"
+  type: "local"
+  description: "本地存储的历史数据"
+  
+  # 存储配置
+  storage:
+    type: "sqlite"  # sqlite, postgresql, mysql
+    path: "data/market_data.db"
+    backup_enabled: true
+    compression: true
+  
+  # 数据更新配置
+  update_schedule:
+    daily_data: "0 18 * * 1-5"  # 工作日18点更新
+    realtime_data: "*/5 * * * 1-5"  # 工作日每5分钟更新
+    fundamental_data: "0 20 * * 0"  # 周日20点更新
+  
+  # 数据保留策略
+  retention_policy:
+    daily_data: 1095  # 3年
+    minute_data: 90   # 3个月
+    tick_data: 7      # 7天
+
+# 数据源故障转移配置
+failover:
+  # 自动故障转移
+  enable_auto_failover: true
+  health_check_interval: 60  # 秒
+  failure_threshold: 3
+  recovery_threshold: 2
+  
+  # 故障转移策略
+  strategies:
+    realtime_data:
+      primary: "eastmoney"
+      fallback: ["tushare", "local"]
+      timeout: 5
+    
+    historical_data:
+      primary: "tushare"
+      fallback: ["eastmoney", "local"]
+      timeout: 30
+    
+    fundamental_data:
+      primary: "tushare"
+      fallback: ["local"]
+      timeout: 60
+
+# 数据质量控制
+quality_control:
+  # 数据验证规则
+  validation_rules:
+    price_range: [0.01, 10000]  # 价格合理范围
+    volume_range: [0, 1000000000000]  # 成交量范围
+    pct_change_range: [-0.20, 0.20]  # 涨跌幅范围
+    
+  # 异常数据处理
+  anomaly_handling:
+    method: "interpolation"  # interpolation, removal, flagging
+    max_consecutive_missing: 5
+    outlier_threshold: 3.0
+    
+  # 数据完整性检查
+  integrity_checks:
+    enable_duplicate_check: true
+    enable_sequence_check: true
+    enable_consistency_check: true
+
+# 缓存配置
+cache:
+  # 缓存策略
+  strategy: "lru"  # lru, lfu, ttl
+  max_size: 10000
+  ttl: 3600  # 1小时
+  
+  # 缓存层级
+  levels:
+    l1_memory:
+      enabled: true
+      size: 1000
+      ttl: 300  # 5分钟
+    
+    l2_redis:
+      enabled: false
+      host: "localhost"
+      port: 6379
+      db: 0
+      ttl: 3600
+    
+    l3_disk:
+      enabled: true
+      path: "cache/data"
+      size: "1GB"
+      ttl: 86400  # 24小时
+
+# 监控和告警
+monitoring:
+  # 数据源健康监控
+  health_monitoring:
+    enabled: true
+    check_interval: 60
+    timeout: 10
+    
+  # 数据质量监控
+  quality_monitoring:
+    enabled: true
+    check_interval: 300
+    alert_threshold: 0.95
+    
+  # 性能监控
+  performance_monitoring:
+    enabled: true
+    response_time_threshold: 5.0
+    error_rate_threshold: 0.05
+    
+  # 告警配置
+  alerts:
+    data_source_down: true
+    data_quality_degraded: true
+    rate_limit_exceeded: true
+    cache_miss_rate_high: true
