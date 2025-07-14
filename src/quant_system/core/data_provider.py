@@ -401,7 +401,7 @@ class HistoricalDataProvider:
                                 low_price=float(fields[4]),
                                 volume=int(fields[5]),
                                 amount=float(fields[6]),
-                                change_pct=float(fields[8])
+                                pct_change=float(fields[8])
                             ))
 
                     logger.info(f"获取{code}历史数据成功: {len(historical_data)}条")
