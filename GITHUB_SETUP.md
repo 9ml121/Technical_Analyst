@@ -16,7 +16,7 @@
 2. 点击右上角的 "+" 按钮
 3. 选择 "New repository"
 4. 填写仓库信息：
-   - **Repository name**: `quantitative-investment-system`
+   - **Repository name**: `Technical_Analyst`
    - **Description**: `🚀 企业级量化投资系统 - 重构完成版 v2.0 | 模块化架构 | 性能优化 | 完整测试`
    - **Visibility**: Public (推荐) 或 Private
    - **不要**勾选 "Initialize this repository with a README"
@@ -24,8 +24,9 @@
 
 #### 2. 连接本地仓库到GitHub
 ```bash
-# 添加远程仓库 (替换YOUR_USERNAME为您的GitHub用户名)
-git remote add origin https://github.com/YOUR_USERNAME/quantitative-investment-system.git
+# 远程仓库已设置为正确的名称
+git remote -v
+# 应该显示: origin https://github.com/9ml121/Technical_Analyst.git
 
 # 推送代码到GitHub
 git branch -M main
@@ -47,7 +48,7 @@ git push -u origin main
 ## 📝 推荐的仓库设置
 
 ### 仓库名称建议
-- `quantitative-investment-system`
+- `Technical_Analyst` (当前使用)
 - `quant-trading-system`
 - `algorithmic-trading-platform`
 
@@ -101,12 +102,12 @@ performance-optimization
 - 🚀 **自动化部署**: 一键部署到多环境
 
 ### 📊 性能提升
-| 指标 | 优化前 | 优化后 | 提升 |
-|------|--------|--------|------|
-| 配置加载 | 8.8ms | 3.8ms | 2.3x |
-| 数据处理 | 45ms | 15ms | 3.0x |
-| 数据筛选 | 120ms | 35ms | 3.4x |
-| 内存使用 | 45MB | 32MB | 1.4x |
+| 指标     | 优化前 | 优化后 | 提升 |
+| -------- | ------ | ------ | ---- |
+| 配置加载 | 8.8ms  | 3.8ms  | 2.3x |
+| 数据处理 | 45ms   | 15ms   | 3.0x |
+| 数据筛选 | 120ms  | 35ms   | 3.4x |
+| 内存使用 | 45MB   | 32MB   | 1.4x |
 
 ### 🎯 主要功能
 - 📈 **市场数据**: 实时数据获取和处理
