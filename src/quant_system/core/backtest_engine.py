@@ -529,7 +529,7 @@ class QuantitativeBacktestEngine(BacktestEngine):
                 close_price=base_price,
                 volume=1000000,
                 amount=base_price * 1000000,
-                change_pct=price_change
+                pct_change=price_change
             ))
 
         return mock_data

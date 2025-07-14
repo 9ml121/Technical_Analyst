@@ -319,7 +319,7 @@ class HistoricalDataProvider:
                     close_price=row[5] or 0,
                     volume=row[6] or 0,
                     amount=row[7] or 0,
-                    change_pct=row[8] or 0
+                    pct_change=row[8] or 0
                 ))
 
             return data
