@@ -95,38 +95,59 @@ class StockDataValidator:
         return False
     
     @staticmethod
-    def validate_price_data(data: StockData) -> List[str]:
+    def validate_price_data(data) -> bool:
         """验证价格数据的合理性"""
-        errors = []
+        # 如果传入的是单个价格值
+        if isinstance(data, (int, float)):
+            return 0 < data <= 10000  # 价格合理范围
         
-        # 价格必须为正数
-        if data.open_price <= 0:
-            errors.append("开盘价必须大于0")
-        if data.close_price <= 0:
-            errors.append("收盘价必须大于0")
-        if data.high_price <= 0:
-            errors.append("最高价必须大于0")
-        if data.low_price <= 0:
-            errors.append("最低价必须大于0")
+        # 如果传入的是StockData对象
+        if hasattr(data, 'open_price'):
+            errors = []
+            
+            # 价格必须为正数
+            if data.open_price <= 0:
+                errors.append("开盘价必须大于0")
+            if data.close_price <= 0:
+                errors.append("收盘价必须大于0")
+            if data.high_price <= 0:
+                errors.append("最高价必须大于0")
+            if data.low_price <= 0:
+                errors.append("最低价必须大于0")
         
-        # 价格关系验证
-        if data.high_price < max(data.open_price, data.close_price, data.low_price):
-            errors.append("最高价不能小于开盘价、收盘价或最低价")
+            # 价格关系验证
+            if data.high_price < max(data.open_price, data.close_price, data.low_price):
+                errors.append("最高价不能小于开盘价、收盘价或最低价")
+            
+            if data.low_price > min(data.open_price, data.close_price, data.high_price):
+                errors.append("最低价不能大于开盘价、收盘价或最高价")
+            
+            # 成交量和成交额验证
+            if hasattr(data, 'volume') and data.volume < 0:
+                errors.append("成交量不能为负数")
+            if hasattr(data, 'amount') and data.amount < 0:
+                errors.append("成交额不能为负数")
+            
+            # 涨跌幅合理性验证 (A股涨跌停限制)
+            if hasattr(data, 'pct_change') and data.pct_change and abs(data.pct_change) > 0.20:  # 20%涨跌停
+                errors.append("涨跌幅超过合理范围")
+            
+            return len(errors) == 0
         
-        if data.low_price > min(data.open_price, data.close_price, data.high_price):
-            errors.append("最低价不能大于开盘价、收盘价或最高价")
+        return False
+    
+    @staticmethod
+    def validate_volume_data(data) -> bool:
+        """验证成交量数据的合理性"""
+        # 如果传入的是单个成交量值
+        if isinstance(data, (int, float)):
+            return data >= 0
         
-        # 成交量和成交额验证
-        if data.volume < 0:
-            errors.append("成交量不能为负数")
-        if data.amount < 0:
-            errors.append("成交额不能为负数")
+        # 如果传入的是StockData对象
+        if hasattr(data, 'volume'):
+            return data.volume >= 0
         
-        # 涨跌幅合理性验证 (A股涨跌停限制)
-        if data.pct_change and abs(data.pct_change) > 0.20:  # 20%涨跌停
-            errors.append("涨跌幅超过合理范围")
-        
-        return errors
+        return False
 
 class StockDataProcessor:
     """股票数据处理器"""

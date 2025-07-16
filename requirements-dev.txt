@@ -1,0 +1,254 @@
+# 开发和测试依赖包
+# Development and Testing Dependencies
+
+# 基础依赖（从requirements.txt继承）
+-r requirements.txt
+
+# 测试框架
+pytest>=7.0.0                    # 测试框架
+pytest-cov>=4.0.0               # 测试覆盖率
+pytest-mock>=3.10.0             # Mock支持
+pytest-asyncio>=0.21.0          # 异步测试支持
+pytest-xdist>=3.0.0             # 并行测试
+pytest-benchmark>=4.0.0         # 性能基准测试
+
+# 代码质量工具
+flake8>=6.0.0                   # 代码风格检查
+black>=23.0.0                   # 代码格式化
+isort>=5.12.0                   # import排序
+mypy>=1.0.0                     # 类型检查
+pylint>=2.17.0                  # 代码质量检查
+bandit>=1.7.0                   # 安全检查
+
+# 文档生成
+sphinx>=6.0.0                   # 文档生成
+sphinx-rtd-theme>=1.2.0         # 文档主题
+sphinx-autodoc-typehints>=1.22.0 # 类型提示文档
+myst-parser>=1.0.0              # Markdown支持
+
+# 开发工具
+pre-commit>=3.0.0               # Git钩子
+commitizen>=3.0.0               # 提交规范
+bump2version>=1.0.0             # 版本管理
+twine>=4.0.0                    # 包发布
+
+# 性能分析
+memory-profiler>=0.60.0         # 内存分析
+line-profiler>=4.0.0            # 行级性能分析
+py-spy>=0.3.0                   # 生产环境性能分析
+
+# 调试工具
+ipdb>=0.13.0                    # 调试器
+pdbpp>=0.10.0                   # 增强调试器
+icecream>=2.1.0                 # 调试打印
+
+# 数据分析和可视化（开发用）
+jupyter>=1.0.0                  # Jupyter notebook
+jupyterlab>=4.0.0               # JupyterLab
+matplotlib>=3.7.0               # 绘图
+seaborn>=0.12.0                 # 统计绘图
+plotly>=5.14.0                  # 交互式图表
+
+# 数据库工具
+sqlalchemy-utils>=0.41.0        # SQLAlchemy工具
+alembic>=1.11.0                 # 数据库迁移
+
+# 网络和API测试
+responses>=0.23.0               # HTTP响应模拟
+httpx>=0.24.0                   # 现代HTTP客户端
+aioresponses>=0.7.0             # 异步HTTP响应模拟
+
+# 配置和环境管理
+python-dotenv>=1.0.0            # 环境变量管理
+dynaconf>=3.1.0                 # 动态配置管理
+
+# 并发和异步
+asyncio-mqtt>=0.13.0            # 异步MQTT
+aiofiles>=23.0.0                # 异步文件操作
+
+# 监控和日志
+structlog>=23.0.0               # 结构化日志
+colorlog>=6.7.0                 # 彩色日志
+rich>=13.0.0                    # 富文本终端输出
+
+# 安全和加密
+cryptography>=41.0.0            # 加密库
+passlib>=1.7.0                  # 密码哈希
+
+# 时间和日期处理
+arrow>=1.2.0                    # 时间处理库
+pendulum>=2.1.0                 # 时区处理
+
+# 数据验证
+cerberus>=1.3.0                 # 数据验证
+marshmallow>=3.19.0             # 序列化和验证
+pydantic[email]>=2.0.0          # 数据验证（如果不在主依赖中）
+
+# 缓存
+diskcache>=5.6.0                # 磁盘缓存
+redis>=4.5.0                    # Redis客户端
+
+# 任务队列
+celery>=5.3.0                   # 分布式任务队列
+kombu>=5.3.0                    # 消息传递库
+
+# 机器学习开发工具
+scikit-learn>=1.3.0             # 机器学习（如果不在主依赖中）
+xgboost>=1.7.0                  # 梯度提升
+lightgbm>=4.0.0                 # 轻量级梯度提升
+optuna>=3.2.0                   # 超参数优化
+mlflow>=2.4.0                   # ML实验跟踪
+
+# 数据处理增强
+polars>=0.18.0                  # 高性能数据框架
+dask>=2023.6.0                  # 并行计算
+vaex>=4.16.0                    # 大数据可视化
+
+# API开发
+fastapi>=0.100.0                # 现代API框架
+uvicorn>=0.22.0                 # ASGI服务器
+starlette>=0.27.0               # 轻量级ASGI框架
+
+# 容器化和部署
+docker>=6.1.0                   # Docker客户端
+kubernetes>=26.1.0              # Kubernetes客户端
+
+# 云服务
+boto3>=1.26.0                   # AWS SDK
+google-cloud-storage>=2.9.0     # Google Cloud存储
+azure-storage-blob>=12.16.0     # Azure存储
+
+# 开发服务器和热重载
+watchdog>=3.0.0                 # 文件监控
+livereload>=2.6.0               # 自动重载
+
+# 代码生成和模板
+cookiecutter>=2.1.0             # 项目模板
+jinja2>=3.1.0                   # 模板引擎
+
+# 系统监控
+psutil>=5.9.0                   # 系统信息（如果不在主依赖中）
+py-cpuinfo>=9.0.0               # CPU信息
+
+# 网络工具
+ping3>=4.0.0                    # Ping工具
+speedtest-cli>=2.1.0            # 网速测试
+
+# 文件处理
+openpyxl>=3.1.0                 # Excel文件处理
+xlsxwriter>=3.1.0               # Excel写入
+python-magic>=0.4.0             # 文件类型检测
+
+# 图像处理（如果需要）
+pillow>=10.0.0                  # 图像处理
+opencv-python>=4.8.0            # 计算机视觉
+
+# 自然语言处理（如果需要）
+jieba>=0.42.0                   # 中文分词
+textblob>=0.17.0                # 文本处理
+
+# 地理信息（如果需要）
+geopy>=2.3.0                    # 地理编码
+folium>=0.14.0                  # 地图可视化
+
+# 区块链和加密货币（如果需要）
+web3>=6.8.0                     # 以太坊客户端
+ccxt>=4.0.0                     # 加密货币交易所API
+
+# 邮件发送
+yagmail>=0.15.0                 # 简化邮件发送
+sendgrid>=6.10.0                # SendGrid邮件服务
+
+# 短信发送
+twilio>=8.5.0                   # Twilio短信服务
+
+# 推送通知
+pyfcm>=1.5.0                    # Firebase推送
+plyer>=2.1.0                    # 跨平台通知
+
+# 二维码生成
+qrcode>=7.4.0                   # 二维码生成
+python-barcode>=0.14.0          # 条形码生成
+
+# PDF处理
+pypdf2>=3.0.0                   # PDF处理
+reportlab>=4.0.0                # PDF生成
+
+# 音频处理（如果需要）
+pydub>=0.25.0                   # 音频处理
+librosa>=0.10.0                 # 音频分析
+
+# 视频处理（如果需要）
+moviepy>=1.0.0                  # 视频处理
+
+# 游戏开发（如果需要）
+pygame>=2.5.0                   # 游戏开发
+
+# GUI开发（如果需要）
+tkinter-tooltip>=2.0.0          # Tkinter工具提示
+customtkinter>=5.2.0            # 现代Tkinter
+
+# 桌面应用（如果需要）
+pyqt5>=5.15.0                   # Qt GUI框架
+kivy>=2.2.0                     # 跨平台GUI
+
+# 移动应用（如果需要）
+buildozer>=1.5.0                # Android应用构建
+
+# 硬件控制（如果需要）
+pyserial>=3.5.0                 # 串口通信
+gpiozero>=1.6.0                 # 树莓派GPIO
+
+# 物联网（如果需要）
+paho-mqtt>=1.6.0                # MQTT客户端
+bleak>=0.21.0                   # 蓝牙低功耗
+
+# 人工智能和深度学习（如果需要）
+torch>=2.0.0                    # PyTorch
+tensorflow>=2.13.0              # TensorFlow
+transformers>=4.30.0            # Hugging Face Transformers
+openai>=0.27.0                  # OpenAI API
+
+# 语音识别和合成（如果需要）
+speechrecognition>=3.10.0       # 语音识别
+pyttsx3>=2.90.0                 # 语音合成
+
+# 爬虫和网页解析（如果需要）
+scrapy>=2.9.0                   # 爬虫框架
+beautifulsoup4>=4.12.0          # HTML解析
+selenium>=4.10.0                # 浏览器自动化
+
+# 代码混淆和保护（如果需要）
+pyarmor>=8.2.0                  # 代码混淆
+
+# 性能优化（如果需要）
+numba>=0.57.0                   # JIT编译
+cython>=3.0.0                   # Python到C编译
+
+# 分布式计算（如果需要）
+ray>=2.5.0                      # 分布式计算
+dask-distributed>=2023.6.0      # 分布式Dask
+
+# 版本控制工具
+gitpython>=3.1.0                # Git操作
+dulwich>=0.21.0                 # 纯Python Git实现
+
+# 项目管理
+poetry>=1.5.0                   # 依赖管理
+pipenv>=2023.6.0                # 虚拟环境管理
+
+# 代码统计
+cloc>=1.60.0                    # 代码行数统计
+radon>=6.0.0                    # 代码复杂度分析
+
+# 许可证检查
+pip-licenses>=4.3.0             # 许可证检查
+licensecheck>=2023.1.0          # 许可证验证
+
+# 依赖分析
+pipdeptree>=2.9.0               # 依赖树分析
+safety>=2.3.0                   # 安全漏洞检查
+
+# 环境信息
+pigar>=2.1.0                    # 自动生成requirements
+pip-tools>=6.13.0               # 依赖管理工具

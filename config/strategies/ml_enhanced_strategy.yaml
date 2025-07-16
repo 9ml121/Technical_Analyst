@@ -1,0 +1,125 @@
+# 机器学习增强策略配置
+# 基于机器学习的多因子选股策略
+
+# 策略基本信息
+strategy_info:
+  name: "机器学习增强策略"
+  version: "2.0.0"
+  description: "基于机器学习的多因子选股策略，结合技术指标和预测模型"
+  author: "量化投资系统"
+  created_date: "2024-01-01"
+  last_modified: "2024-01-01"
+  strategy_type: "ml_enhanced"
+
+# 机器学习模型配置
+model_config:
+  model_type: "random_forest" # random_forest, gradient_boosting, linear
+  n_estimators: 200
+  max_depth: 15
+  learning_rate: 0.1
+  feature_selection: "kbest" # kbest, rfe, none
+  n_features: 20
+  target_horizon: 5 # 预测未来5天的收益率
+  retrain_frequency: 30 # 每30天重新训练一次
+
+# 信号生成配置
+signal_config:
+  signal_threshold: 0.02 # 信号阈值，预测收益率超过2%才买入
+  confidence_threshold: 0.6 # 置信度阈值
+  min_confidence: 0.6 # 最小置信度
+
+# 仓位管理配置
+position_sizing:
+  method: "kelly" # kelly, equal, volatility_adjusted
+  max_position_pct: 0.15 # 单只股票最大仓位
+  max_positions: 8 # 最大持仓数量
+
+# 风险管理配置
+risk_management:
+  stop_loss_pct: 0.04 # 止损比例
+  take_profit_pct: 0.08 # 止盈比例
+  max_drawdown_pct: 0.08 # 最大回撤
+  trailing_stop: true # 启用追踪止损
+  trailing_stop_pct: 0.02 # 追踪止损比例
+
+# 特征工程配置
+feature_engineering:
+  # 价格特征
+  enable_price_features: true
+  price_lookback_periods: [1, 5, 10, 20, 60]
+
+  # 成交量特征
+  enable_volume_features: true
+  volume_lookback_periods: [5, 10, 20]
+
+  # 技术指标特征
+  enable_technical_features: true
+  technical_indicators:
+    - "rsi"
+    - "macd"
+    - "bollinger_bands"
+    - "kdj"
+    - "atr"
+
+  # 动量特征
+  enable_momentum_features: true
+  momentum_periods: [3, 5, 10, 20]
+
+  # 波动率特征
+  enable_volatility_features: true
+  volatility_periods: [5, 20]
+
+  # 趋势特征
+  enable_trend_features: true
+  trend_periods: [20]
+
+  # 形态特征
+  enable_pattern_features: true
+
+# 数据筛选配置
+stock_screening:
+  # 基础筛选
+  min_market_cap: 10000000000 # 最小市值10亿
+  max_market_cap: 500000000000 # 最大市值5000亿
+  min_price: 5.0 # 最小股价
+  max_price: 200.0 # 最大股价
+  min_volume: 10000000 # 最小成交额1000万
+
+  # 排除条件
+  exclude_st: true # 排除ST股票
+  exclude_new_stocks: true # 排除新股
+  new_stock_days_limit: 60 # 新股天数限制
+
+  # 行业筛选
+  excluded_industries: ["房地产", "钢铁", "煤炭"]
+  included_sectors: ["科技", "医药", "消费", "新能源"]
+
+# 回测配置
+backtest_config:
+  initial_capital: 1000000 # 初始资金100万
+  commission_rate: 0.0003 # 手续费率0.03%
+  slippage_rate: 0.0001 # 滑点率0.01%
+  benchmark: "000300" # 基准指数沪深300
+
+# 性能监控配置
+performance_monitoring:
+  enable_real_time_monitoring: true
+  performance_metrics:
+    - "sharpe_ratio"
+    - "max_drawdown"
+    - "win_rate"
+    - "profit_factor"
+    - "calmar_ratio"
+
+  alert_thresholds:
+    max_drawdown: 0.10 # 最大回撤超过10%报警
+    consecutive_losses: 5 # 连续亏损5次报警
+    model_accuracy_drop: 0.1 # 模型准确性下降10%报警
+
+# 模型保存和加载配置
+model_persistence:
+  save_model: true
+  model_save_path: "models/ml_strategy_model.pkl"
+  auto_save_frequency: 30 # 每30天自动保存
+  backup_models: true
+  max_backup_count: 5

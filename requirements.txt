@@ -19,6 +19,10 @@ akshare>=1.17.0
 # 高级数据源 - 可选 (需要token)
 tushare>=1.2.89
 
+# 机器学习 - 新增
+scikit-learn>=1.0.0
+joblib>=1.1.0
+
 # 任务调度 - 可选
 schedule>=1.2.0
 
@@ -31,7 +35,7 @@ pytest-cov>=4.0.0
 black>=22.0.0
 flake8>=5.0.0
 
-# 技术分析 - 可选 (安装复杂，暂时注释)
+# 技术分析库 - 通过conda安装: conda install -c conda-forge ta-lib
 # talib>=0.4.0
 
 # 文档生成 - 可选

@@ -38,13 +38,13 @@ class HighPerformanceTrainerV4:
     def __init__(self, max_workers: int = None, use_processes: bool = False):
         """
         初始化高性能训练器
-        
+
         Args:
             max_workers: 最大工作线程/进程数
             use_processes: 是否使用进程池（CPU密集型任务）
         """
-        self.max_workers = max_workers or min(32, (mp.cpu_count() or 1) + 4)
-        self.use_processes = use_processes
+        self.max_workers = max_workers or 1  # 降低到1，减少并发压力
+        self.use_processes = False  # 强制使用线程池，避免进程间通信开销
         self.training_data = []
         self.market_periods = {}
         self.strategy = None
@@ -133,11 +133,11 @@ class HighPerformanceTrainerV4:
 
     def _get_default_stock_pool(self) -> List[str]:
         """获取默认股票池"""
-        # 返回一些代表性股票
+        # 返回3只代表性股票进行极简测试
         return [
-            '000001', '000002', '000858', '002415', '300059',  # 主板和创业板
-            '600036', '600519', '000858', '002594', '300750',  # 银行、白酒、新能源
-            '688981', '688111', '688012', '688001', '688002'   # 科创板
+            '000001',  # 平安银行
+            '000002',  # 万科A
+            '600036'   # 招商银行
         ]
 
     def _calculate_returns_parallel(self, fetcher, stock_codes: List[str],
@@ -180,8 +180,11 @@ class HighPerformanceTrainerV4:
                     result = future.result(timeout=30)  # 30秒超时
                     if result is not None:
                         returns[code] = result
+                    # 添加请求间隔，降低API频率
+                    time.sleep(1)
                 except Exception as e:
                     print(f"   ⚠️ 计算股票 {code} 涨幅失败: {e}")
+                    time.sleep(1)  # 即使失败也要等待
                     continue
 
         return returns
@@ -324,8 +327,11 @@ class HighPerformanceTrainerV4:
                     result = future.result(timeout=60)  # 60秒超时
                     if result:
                         batch_data[code] = result
+                    # 添加请求间隔，降低API频率
+                    time.sleep(1)
                 except Exception as e:
                     print(f"   ⚠️ 获取股票 {code} 历史数据失败: {e}")
+                    time.sleep(1)  # 即使失败也要等待
                     continue
 
         return batch_data
@@ -541,7 +547,7 @@ def main():
 
     # 创建高性能训练器
     trainer = HighPerformanceTrainerV4(
-        max_workers=8,  # 8个工作线程
+        max_workers=1,  # 降低到1个工作线程，减少并发压力
         use_processes=False  # 使用线程池（IO密集型）
     )
 

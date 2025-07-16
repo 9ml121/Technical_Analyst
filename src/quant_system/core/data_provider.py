@@ -429,7 +429,7 @@ class HistoricalDataProvider:
                 ''', (
                     item.code, item.date.isoformat(), item.open_price,
                     item.high_price, item.low_price, item.close_price,
-                    item.volume, item.amount, item.change_pct
+                    item.volume, item.amount, item.pct_change
                 ))
 
             conn.commit()

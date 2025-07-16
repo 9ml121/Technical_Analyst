@@ -1,0 +1,52 @@
+{
+  "date": "2025-07-15",
+  "market_environment": "neutral",
+  "total_analyzed": 45,
+  "total_signals": 37,
+  "filtered_signals": 3,
+  "recommendations": [
+    {
+      "action": "BUY",
+      "confidence": 0.95,
+      "expected_return": 0.075,
+      "stock_code": "300408",
+      "momentum_5d": 0.09199916236301853,
+      "momentum_10d": 0.060401493146709395,
+      "volume_ratio": 1.093574556302595,
+      "volatility": 0.020684498003066373,
+      "risk_score": 0.18599560318080394,
+      "liquidity_score": 0.4135790446349184
+    },
+    {
+      "action": "BUY",
+      "confidence": 0.95,
+      "expected_return": 0.075,
+      "stock_code": "300782",
+      "momentum_5d": 0.031218412144203844,
+      "momentum_10d": 0.10701261915496474,
+      "volume_ratio": 0.9717258814234038,
+      "volatility": 0.015734226795046363,
+      "risk_score": 0.17145709878214782,
+      "liquidity_score": 0.5081031534910803
+    },
+    {
+      "action": "BUY",
+      "confidence": 0.95,
+      "expected_return": 0.075,
+      "stock_code": "688012",
+      "momentum_5d": 0.06082352343714725,
+      "momentum_10d": 0.07289968840875538,
+      "volume_ratio": 1.0664198744449738,
+      "volatility": 0.024834848873955692,
+      "risk_score": 0.21123481521493837,
+      "liquidity_score": 0.45950791613719244
+    }
+  ],
+  "risk_control_summary": {
+    "max_signals_per_day": 3,
+    "min_confidence": 0.6,
+    "min_expected_return": 0.02,
+    "max_risk_score": 0.5,
+    "min_liquidity_score": 0.4
+  }
+}

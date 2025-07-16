@@ -1,0 +1,15 @@
+{
+  "performance_thresholds": {
+    "min_sharpe_ratio": 0.8,
+    "max_drawdown": 0.15,
+    "min_win_rate": 0.55,
+    "max_volatility": 0.25
+  },
+  "risk_alerts": {
+    "drawdown_alert": 0.1,
+    "volatility_alert": 0.2,
+    "loss_streak_alert": 5
+  },
+  "model_update_frequency": 20,
+  "performance_evaluation_period": 30
+}

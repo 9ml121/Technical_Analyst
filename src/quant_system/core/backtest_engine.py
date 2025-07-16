@@ -13,7 +13,7 @@ from collections import defaultdict
 import copy
 
 from quant_system_architecture import BacktestEngine, TradeRecord, Position, StockData, StrategyEngine, DataProvider
-from trading_strategy import QuantitativeTradingStrategy
+from quant_system_architecture import QuantitativeTradingStrategy
 
 logger = logging.getLogger(__name__)
 
@@ -686,6 +686,7 @@ if __name__ == "__main__":
     from datetime import date, timedelta
 
     # 创建策略和回测引擎
+    from quant_system.core.trading_strategy import QuantitativeTradingStrategy
     strategy = QuantitativeTradingStrategy()
     backtest_engine = QuantitativeBacktestEngine()
 

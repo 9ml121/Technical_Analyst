@@ -1,0 +1,155 @@
+# 正式量化交易策略配置
+# 基于多因子选股和机器学习增强的量化交易策略
+
+# 策略基本信息
+strategy_info:
+  name: "正式量化交易策略V1.0"
+  version: "1.0.0"
+  description: "基于多因子选股和机器学习增强的量化交易策略"
+  author: "量化投资系统"
+  created_date: "2024-01-01"
+  last_modified: "2024-01-01"
+  strategy_type: "formal_quantitative"
+
+# 选股配置
+stock_screening:
+  # 基础筛选
+  min_market_cap: 10000000000 # 最小市值10亿
+  max_market_cap: 500000000000 # 最大市值5000亿
+  min_price: 5.0 # 最小股价
+  max_price: 200.0 # 最大股价
+  min_volume: 10000000 # 最小成交额1000万
+
+  # 排除条件
+  exclude_st: true # 排除ST股票
+  exclude_new_stocks: true # 排除新股
+  new_stock_days_limit: 60 # 新股天数限制
+
+  # 行业筛选
+  excluded_industries: ["房地产", "钢铁", "煤炭"]
+  included_sectors: ["科技", "医药", "消费", "新能源"]
+
+# 技术指标配置
+technical_indicators:
+  # 动量指标
+  momentum_periods: [5, 10, 20, 60]
+
+  # 成交量指标
+  volume_periods: [5, 10, 20]
+
+  # 波动率指标
+  volatility_periods: [20]
+
+  # RSI指标
+  rsi_period: 14
+
+  # MACD指标
+  macd_fast: 12
+  macd_slow: 26
+  macd_signal: 9
+
+  # 布林带指标
+  bollinger_period: 20
+  bollinger_std: 2
+
+# 信号生成配置
+signal_generation:
+  # 买入信号阈值
+  buy_thresholds:
+    momentum_20d: 0.15 # 20日动量超过15%
+    volume_ratio: 1.5 # 成交量放大1.5倍
+    rsi_buy: 30 # RSI买入阈值
+    rsi_sell: 70 # RSI卖出阈值
+    ma_bullish: true # 均线多头排列
+    volatility_max: 0.05 # 最大波动率
+
+  # 卖出信号阈值
+  sell_thresholds:
+    stop_loss: -0.05 # 止损5%
+    take_profit: 0.15 # 止盈15%
+    momentum_reversal: -0.05 # 动量反转
+    volume_shrink: 0.5 # 成交量萎缩
+
+# 风险管理配置
+risk_management:
+  # 仓位管理
+  max_positions: 8 # 最大持仓数
+  max_position_pct: 0.15 # 单只股票最大仓位
+  max_sector_exposure: 0.30 # 单行业最大暴露
+
+  # 止损止盈
+  stop_loss_pct: 0.05 # 止损比例
+  take_profit_pct: 0.15 # 止盈比例
+  max_drawdown_pct: 0.10 # 最大回撤
+
+  # 追踪止损
+  trailing_stop: true # 启用追踪止损
+  trailing_stop_pct: 0.03 # 追踪止损比例
+
+# 回测配置
+backtest:
+  # 基础设置
+  initial_capital: 1000000 # 初始资金100万
+  start_date: "2023-01-01"
+  end_date: "2024-01-01"
+
+  # 交易设置
+  max_positions: 8 # 最大持仓数量
+  position_size_pct: 0.15 # 单只股票仓位比例
+
+  # 费用设置
+  commission_rate: 0.0003 # 手续费率
+  stamp_tax_rate: 0.001 # 印花税率(卖出时)
+  slippage_rate: 0.001 # 滑点率
+  min_commission: 5.0 # 最小手续费
+
+  # 风控设置
+  stop_loss_pct: 0.05 # 止损比例
+  stop_profit_pct: 0.15 # 止盈比例
+  max_drawdown: 0.10 # 最大回撤限制
+
+  # 基准设置
+  benchmark: "000300.SH" # 沪深300指数
+
+# 性能监控配置
+performance_monitoring:
+  enable_real_time_monitoring: true
+  performance_metrics:
+    - "sharpe_ratio"
+    - "max_drawdown"
+    - "win_rate"
+    - "profit_factor"
+    - "calmar_ratio"
+    - "sortino_ratio"
+    - "information_ratio"
+
+  alert_thresholds:
+    max_drawdown: 0.10 # 最大回撤超过10%报警
+    consecutive_losses: 5 # 连续亏损5次报警
+    model_accuracy_drop: 0.1 # 模型准确性下降10%报警
+
+# 数据源配置
+data_sources:
+  # 主要数据源
+  primary_source: "eastmoney" # 东方财富
+  backup_sources: ["tushare", "yfinance"] # 备用数据源
+
+  # 数据质量要求
+  min_data_points: 60 # 最少数据点数
+  data_freshness_hours: 24 # 数据新鲜度要求（小时）
+
+# 模型保存和加载配置
+model_persistence:
+  save_model: true
+  model_save_path: "models/formal_strategy_model.pkl"
+  auto_save_frequency: 30 # 每30天自动保存
+  backup_models: true
+  max_backup_count: 5
+
+# 日志配置
+logging:
+  level: "INFO"
+  file: "logs/formal_strategy.log"
+  max_file_size: 10485760 # 10MB
+  backup_count: 5
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

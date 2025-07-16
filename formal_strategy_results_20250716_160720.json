@@ -1,0 +1,101 @@
+{
+  "strategy_info": {
+    "name": "正式量化交易策略V1.0",
+    "version": "1.0.0",
+    "description": "基于多因子选股和机器学习增强的量化交易策略"
+  },
+  "config": {
+    "strategy_info": {
+      "name": "正式量化交易策略V1.0",
+      "version": "1.0.0",
+      "description": "基于多因子选股和机器学习增强的量化交易策略",
+      "author": "量化投资系统",
+      "created_date": "2024-01-01"
+    },
+    "stock_screening": {
+      "min_market_cap": 10000000000,
+      "max_market_cap": 500000000000,
+      "min_price": 5.0,
+      "max_price": 200.0,
+      "min_volume": 10000000,
+      "exclude_st": true,
+      "exclude_new_stocks": true,
+      "new_stock_days_limit": 60,
+      "excluded_industries": [
+        "房地产",
+        "钢铁",
+        "煤炭"
+      ],
+      "included_sectors": [
+        "科技",
+        "医药",
+        "消费",
+        "新能源"
+      ]
+    },
+    "technical_indicators": {
+      "momentum_periods": [
+        5,
+        10,
+        20,
+        60
+      ],
+      "volume_periods": [
+        5,
+        10,
+        20
+      ],
+      "volatility_periods": [
+        20
+      ],
+      "rsi_period": 14,
+      "macd_fast": 12,
+      "macd_slow": 26,
+      "macd_signal": 9,
+      "bollinger_period": 20,
+      "bollinger_std": 2
+    },
+    "signal_generation": {
+      "buy_thresholds": {
+        "momentum_20d": 0.15,
+        "volume_ratio": 1.5,
+        "rsi_buy": 30,
+        "rsi_sell": 70,
+        "ma_bullish": true,
+        "volatility_max": 0.05
+      },
+      "sell_thresholds": {
+        "stop_loss": -0.05,
+        "take_profit": 0.15,
+        "momentum_reversal": -0.05,
+        "volume_shrink": 0.5
+      }
+    },
+    "risk_management": {
+      "max_positions": 8,
+      "max_position_pct": 0.15,
+      "max_sector_exposure": 0.3,
+      "stop_loss_pct": 0.05,
+      "take_profit_pct": 0.15,
+      "max_drawdown_pct": 0.1,
+      "trailing_stop": true,
+      "trailing_stop_pct": 0.03
+    },
+    "backtest": {
+      "initial_capital": 1000000,
+      "commission_rate": 0.0003,
+      "stamp_tax_rate": 0.001,
+      "slippage_rate": 0.001,
+      "benchmark": "000300.SH"
+    }
+  },
+  "results": {
+    "initial_capital": 1000000,
+    "final_value": 1000000,
+    "trades": [],
+    "portfolio_values": [],
+    "positions": {}
+  },
+  "performance_metrics": {},
+  "timestamp": "2025-07-16T16:07:20.620871"
+}
