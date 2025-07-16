@@ -103,7 +103,7 @@ class StrategyPerformance(Base):
     information_ratio = Column(Float, default=0)  # 信息比率
     
     # 详细数据
-    metadata = Column(JSON)  # 额外的性能数据
+    extra_data = Column(JSON)  # 额外的性能数据
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     

@@ -3,20 +3,23 @@
 """
 
 from .user import User
-from .account import SimulatedAccount
+from .account import SimulatedAccount, SimulatedPosition
 from .strategy import Strategy
 from .trade import SimulatedTrade, TradingSignal
-from .market_data import MarketIndex, MarketStats
-from .performance import AccountPerformance, StrategyPerformance
+from .market_data import MarketIndex, MarketStats, StockQuote
+from .performance import AccountPerformance, StrategyPerformance, BenchmarkPerformance
 
 __all__ = [
     "User",
-    "SimulatedAccount", 
+    "SimulatedAccount",
+    "SimulatedPosition",
     "Strategy",
     "SimulatedTrade",
     "TradingSignal",
     "MarketIndex",
-    "MarketStats", 
+    "MarketStats",
+    "StockQuote",
     "AccountPerformance",
-    "StrategyPerformance"
+    "StrategyPerformance",
+    "BenchmarkPerformance"
 ]

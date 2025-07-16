@@ -1,0 +1,78 @@
+/* 模拟实盘交易页面样式 */
+
+.trading-page {
+  padding: 16px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.trading-page .ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.trading-page .ant-card-head {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 12px 16px;
+}
+
+.trading-page .ant-card-head-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.trading-page .ant-card-body {
+  padding: 16px;
+}
+
+.trading-page .ant-statistic-title {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.trading-page .ant-statistic-content {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.trading-page .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.trading-page .ant-table-tbody > tr > td {
+  font-size: 12px;
+}
+
+.trading-page .ant-table-tbody > tr:hover > td {
+  background-color: #f5f5f5;
+}
+
+.trading-page .ant-btn-sm {
+  font-size: 12px;
+  height: 24px;
+  padding: 0 8px;
+}
+
+.trading-page .ant-tag {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .trading-page {
+    padding: 8px;
+  }
+  
+  .trading-page .ant-col {
+    margin-bottom: 8px;
+  }
+  
+  .trading-page .ant-statistic-content {
+    font-size: 16px;
+  }
+}

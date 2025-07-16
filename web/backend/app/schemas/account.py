@@ -51,20 +51,33 @@ class AccountResponse(AccountBase):
         from_attributes = True
 
 class AccountSummary(BaseModel):
-    """账户概要模式"""
+    """账户概览模式 - 用于模拟实盘交易页面"""
+    account_id: int = Field(..., description="账户ID")
+    account_name: str = Field(..., description="账户名称")
+
+    # 资产信息
     total_asset: float = Field(..., description="总资产")
-    total_return: float = Field(..., description="累计收益")
+    total_profit: float = Field(..., description="累计盈亏")
     total_return_rate: float = Field(..., description="累计收益率")
-    today_return: float = Field(..., description="今日收益")
+    today_profit: float = Field(..., description="今日盈亏")
     today_return_rate: float = Field(..., description="今日收益率")
+
+    # 持仓信息
     position_count: int = Field(..., description="持仓数量")
     position_ratio: float = Field(..., description="仓位比例")
-    max_return: float = Field(..., description="最大收益")
-    max_drawdown: float = Field(..., description="最大回撤")
+
+    # 交易统计
+    total_trades: int = Field(..., description="总交易次数")
+    win_trades: int = Field(..., description="盈利交易次数")
     win_rate: float = Field(..., description="胜率")
+
+    # 风险指标
+    max_drawdown: float = Field(..., description="最大回撤")
     sharpe_ratio: float = Field(..., description="夏普比率")
-    volatility: float = Field(..., description="波动率")
-    trade_count: int = Field(..., description="交易次数")
+
+    # 状态信息
+    status: str = Field(..., description="账户状态")
+    last_update: datetime = Field(..., description="最后更新时间")
 
 class PositionBase(BaseModel):
     """持仓基础模式"""

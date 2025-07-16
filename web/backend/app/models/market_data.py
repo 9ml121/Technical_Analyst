@@ -140,7 +140,7 @@ class StockQuote(Base):
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
     
     # 额外信息
-    metadata = Column(JSON)  # 额外的行情数据
+    extra_data = Column(JSON)  # 额外的行情数据
     
     def __repr__(self):
         return f"<StockQuote(symbol='{self.symbol}', price={self.current_price}, change={self.change_percent}%)>"

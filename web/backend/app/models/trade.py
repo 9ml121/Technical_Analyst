@@ -45,7 +45,7 @@ class SimulatedTrade(Base):
     
     # 额外信息
     notes = Column(Text)  # 备注
-    metadata = Column(JSON)  # 额外元数据
+    extra_data = Column(JSON)  # 额外元数据
     
     # 关联关系
     account = relationship("SimulatedAccount", back_populates="trades")
@@ -113,7 +113,7 @@ class TradingSignal(Base):
     
     # 信号原因和元数据
     reason = Column(Text)  # 信号生成原因
-    metadata = Column(JSON)  # 信号元数据（如技术指标值等）
+    extra_data = Column(JSON)  # 信号元数据（如技术指标值等）
     
     # 关联关系
     account = relationship("SimulatedAccount")

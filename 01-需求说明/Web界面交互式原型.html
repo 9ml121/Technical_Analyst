@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical_Analyst Web界面原型 - 模拟实盘交易</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+        
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab:hover, .nav-tab.active {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .control-panel {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .strategy-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .control-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-change {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .positive { color: #4CAF50; }
+        .negative { color: #f44336; }
+        
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .data-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .table-header {
+            background: #f8f9fa;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .action-btn {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            border-radius: 3px;
+        }
+        
+        .signal-strength {
+            display: flex;
+            gap: 2px;
+        }
+        
+        .signal-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ddd;
+        }
+        
+        .signal-dot.active {
+            background: #4CAF50;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* 策略管理页面样式 */
+        .strategy-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .strategy-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .strategy-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .strategy-card.active {
+            border-color: #4CAF50;
+        }
+
+        .strategy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .strategy-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .strategy-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .strategy-status.running {
+            background: #e8f5e8;
+            color: #4CAF50;
+        }
+
+        .strategy-status.stopped {
+            background: #ffeaa7;
+            color: #fdcb6e;
+        }
+
+        .strategy-metrics {
+            margin-bottom: 1.5rem;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric .label {
+            color: #666;
+        }
+
+        .metric .value {
+            font-weight: 600;
+        }
+
+        .strategy-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .strategy-detail-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .strategy-detail-panel.show {
+            display: block;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .panel-tab {
+            padding: 1rem 2rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .panel-tab:hover, .panel-tab.active {
+            background: #f8f9fa;
+            border-bottom-color: #4CAF50;
+        }
+
+        .panel-content {
+            padding: 2rem;
+        }
+
+        .panel-tab-content {
+            display: none;
+        }
+
+        .panel-tab-content.active {
+            display: block;
+        }
+
+        .param-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .param-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .param-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .param-group input {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .param-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .param-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .log-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 1rem;
+        }
+
+        .log-entry {
+            display: flex;
+            gap: 1rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .log-time {
+            color: #666;
+            font-family: monospace;
+            min-width: 80px;
+        }
+
+        .log-level {
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .log-level.info {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .log-level.success {
+            background: #e8f5e8;
+            color: #4CAF50;
+        }
+
+        .log-level.warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* 大盘分析面板样式 */
+        .market-analysis-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .market-analysis-panel .panel-header {
+            background: linear-gradient(135deg, #2196F3 0%, #21CBF3 100%);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .market-time {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .market-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .market-status.open {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .market-indices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .index-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .index-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .index-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .index-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .index-code {
+            font-size: 0.8rem;
+            color: #666;
+            font-family: monospace;
+        }
+
+        .index-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .index-change {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .change-value, .change-percent {
+            font-weight: 500;
+        }
+
+        .market-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-icon {
+            font-size: 1.2rem;
+        }
+
+        .performance-comparison {
+            padding: 1.5rem;
+        }
+
+        .performance-comparison h4 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .comparison-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .comparison-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-values {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .strategy-value, .market-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+        }
+
+        .strategy-value {
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .market-value {
+            background: rgba(33, 150, 243, 0.1);
+        }
+
+        .vs {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .comparison-result {
+            text-align: center;
+        }
+
+        .outperform {
+            color: #4CAF50;
+            font-weight: 600;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .underperform {
+            color: #f44336;
+            font-weight: 600;
+            background: rgba(244, 67, 54, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        /* 账户表现页面样式 */
+        .account-header {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .account-summary h2 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .account-overview {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .overview-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .overview-item .label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .overview-item .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .time-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .time-btn {
+            padding: 0.8rem 1.5rem;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .time-btn:hover, .time-btn.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        .performance-chart-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-control-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .chart-control-btn:hover, .chart-control-btn.active {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+
+        .stats-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-date {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .returns-detail-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .returns-detail-table .table-header {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .table-control-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .table-control-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .benchmark-comparison {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        .comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .benchmark-selector select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .comparison-metrics {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .comparison-metrics .comparison-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .metric-comparison {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .account-metric, .benchmark-metric {
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        .account-metric {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+        }
+
+        .benchmark-metric {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196F3;
+        }
+
+        .vs-text {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .outperform-badge {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ff6f00;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .neutral {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 Technical_Analyst 量化投资系统</h1>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('trading')">模拟实盘交易</button>
+            <button class="nav-tab" onclick="showTab('account')">账户表现</button>
+            <button class="nav-tab" onclick="showTab('strategy')">策略管理</button>
+            <button class="nav-tab" onclick="showTab('backtest')">回测分析</button>
+            <button class="nav-tab" onclick="showTab('data')">数据管理</button>
+            <button class="nav-tab" onclick="showTab('monitor')">实时监控</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 模拟实盘交易页面 -->
+        <div id="trading" class="tab-content active">
+            <div class="control-panel">
+                <div class="strategy-info">
+                    <div class="status-indicator"></div>
+                    <span><strong>策略:</strong> 动量策略 v2.1</span>
+                    <span><strong>状态:</strong> 运行中</span>
+                    <span><strong>运行时间:</strong> <span id="runtime">02:34:15</span></span>
+                </div>
+                <div class="control-buttons">
+                    <button class="btn btn-secondary" onclick="pauseStrategy()">暂停</button>
+                    <button class="btn btn-danger" onclick="stopStrategy()">停止</button>
+                    <button class="btn btn-primary" onclick="showSettings()">设置</button>
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="totalAssets">¥105,234</div>
+                    <div class="metric-label">总资产</div>
+                    <div class="metric-change positive" id="totalChange">(+5.23%)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value positive" id="todayPnL">+¥5,234</div>
+                    <div class="metric-label">今日盈亏</div>
+                    <div class="metric-change positive" id="todayChange">(+5.23%)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="positionCount">8</div>
+                    <div class="metric-label">持仓数量</div>
+                    <div class="metric-change">仓位: 85%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="winRate">65.2%</div>
+                    <div class="metric-label">胜率</div>
+                    <div class="metric-change">23胜/12负</div>
+                </div>
+            </div>
+
+            <!-- 大盘分析面板 -->
+            <div class="market-analysis-panel">
+                <div class="panel-header">
+                    <h3>📊 大盘分析 - 实时市场概况</h3>
+                    <div class="market-time">
+                        <span id="marketTime">2024-01-16 14:35:22</span>
+                        <span class="market-status open">●交易中</span>
+                    </div>
+                </div>
+
+                <div class="market-indices-grid">
+                    <div class="index-card">
+                        <div class="index-header">
+                            <span class="index-name">上证指数</span>
+                            <span class="index-code">000001</span>
+                        </div>
+                        <div class="index-value" id="shIndex">2,956.85</div>
+                        <div class="index-change">
+                            <span class="change-value positive" id="shChange">+15.23</span>
+                            <span class="change-percent positive" id="shPercent">(+0.52%)</span>
+                        </div>
+                    </div>
+
+                    <div class="index-card">
+                        <div class="index-header">
+                            <span class="index-name">沪深300</span>
+                            <span class="index-code">000300</span>
+                        </div>
+                        <div class="index-value" id="hs300Index">3,456.78</div>
+                        <div class="index-change">
+                            <span class="change-value positive" id="hs300Change">+23.45</span>
+                            <span class="change-percent positive" id="hs300Percent">(+0.68%)</span>
+                        </div>
+                    </div>
+
+                    <div class="index-card">
+                        <div class="index-header">
+                            <span class="index-name">深证成指</span>
+                            <span class="index-code">399001</span>
+                        </div>
+                        <div class="index-value" id="szIndex">9,234.56</div>
+                        <div class="index-change">
+                            <span class="change-value negative" id="szChange">-12.34</span>
+                            <span class="change-percent negative" id="szPercent">(-0.13%)</span>
+                        </div>
+                    </div>
+
+                    <div class="index-card">
+                        <div class="index-header">
+                            <span class="index-name">创业板指</span>
+                            <span class="index-code">399006</span>
+                        </div>
+                        <div class="index-value" id="cybIndex">2,123.45</div>
+                        <div class="index-change">
+                            <span class="change-value positive" id="cybChange">+8.76</span>
+                            <span class="change-percent positive" id="cybPercent">(+0.41%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="market-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value positive" id="riseCount">1,856</div>
+                        <div class="stat-label">上涨</div>
+                        <div class="stat-icon">📈</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value negative" id="fallCount">1,234</div>
+                        <div class="stat-label">下跌</div>
+                        <div class="stat-icon">📉</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="flatCount">456</div>
+                        <div class="stat-label">平盘</div>
+                        <div class="stat-icon">➖</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="limitUpCount">23</div>
+                        <div class="stat-label">涨停</div>
+                        <div class="stat-icon">🔴</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="limitDownCount">8</div>
+                        <div class="stat-label">跌停</div>
+                        <div class="stat-icon">🟢</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalVolume">2,456亿</div>
+                        <div class="stat-label">成交额</div>
+                        <div class="stat-icon">💰</div>
+                    </div>
+                </div>
+
+                <!-- 策略vs大盘对比 -->
+                <div class="performance-comparison">
+                    <h4>📈 策略表现 vs 大盘对比</h4>
+                    <div class="comparison-grid">
+                        <div class="comparison-item">
+                            <div class="comparison-label">今日收益率</div>
+                            <div class="comparison-values">
+                                <span class="strategy-value positive">+5.23%</span>
+                                <span class="vs">vs</span>
+                                <span class="market-value positive">+0.52%</span>
+                            </div>
+                            <div class="comparison-result">
+                                <span class="outperform">跑赢大盘 +4.71%</span>
+                            </div>
+                        </div>
+                        <div class="comparison-item">
+                            <div class="comparison-label">累计收益率</div>
+                            <div class="comparison-values">
+                                <span class="strategy-value positive">+5.23%</span>
+                                <span class="vs">vs</span>
+                                <span class="market-value positive">+2.15%</span>
+                            </div>
+                            <div class="comparison-result">
+                                <span class="outperform">跑赢大盘 +3.08%</span>
+                            </div>
+                        </div>
+                        <div class="comparison-item">
+                            <div class="comparison-label">波动率</div>
+                            <div class="comparison-values">
+                                <span class="strategy-value">12.5%</span>
+                                <span class="vs">vs</span>
+                                <span class="market-value">18.3%</span>
+                            </div>
+                            <div class="comparison-result">
+                                <span class="outperform">风险更低 -5.8%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-section">
+                <div class="chart-container">
+                    <h3>实时盈亏曲线</h3>
+                    <div class="chart-placeholder">📈 实时盈亏曲线图 (与基准对比)</div>
+                </div>
+                <div class="chart-container">
+                    <h3>持仓分布</h3>
+                    <div class="chart-placeholder">🥧 持仓分布饼图 (按行业/个股)</div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">📊 实时持仓详情</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>股票代码</th>
+                            <th>股票名称</th>
+                            <th>持仓量</th>
+                            <th>成本价</th>
+                            <th>现价</th>
+                            <th>盈亏</th>
+                            <th>盈亏率</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="positionsTable">
+                        <tr>
+                            <td>000001</td>
+                            <td>平安银行</td>
+                            <td>1000</td>
+                            <td>¥12.50</td>
+                            <td>¥13.20</td>
+                            <td class="positive">+¥700</td>
+                            <td class="positive">+5.6%</td>
+                            <td><button class="btn btn-danger action-btn" onclick="sellStock('000001')">卖出</button></td>
+                        </tr>
+                        <tr>
+                            <td>600036</td>
+                            <td>招商银行</td>
+                            <td>500</td>
+                            <td>¥45.80</td>
+                            <td>¥47.20</td>
+                            <td class="positive">+¥700</td>
+                            <td class="positive">+3.1%</td>
+                            <td><button class="btn btn-danger action-btn" onclick="sellStock('600036')">卖出</button></td>
+                        </tr>
+                        <tr>
+                            <td>000002</td>
+                            <td>万科A</td>
+                            <td>800</td>
+                            <td>¥18.20</td>
+                            <td>¥17.80</td>
+                            <td class="negative">-¥320</td>
+                            <td class="negative">-2.2%</td>
+                            <td><button class="btn btn-danger action-btn" onclick="sellStock('000002')">卖出</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">📡 交易信号监控</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>股票代码</th>
+                            <th>信号类型</th>
+                            <th>信号强度</th>
+                            <th>价格</th>
+                            <th>状态</th>
+                            <th>执行结果</th>
+                        </tr>
+                    </thead>
+                    <tbody id="signalsTable">
+                        <tr>
+                            <td>14:32:15</td>
+                            <td>000001</td>
+                            <td>买入</td>
+                            <td>
+                                <div class="signal-strength">
+                                    <div class="signal-dot active"></div>
+                                    <div class="signal-dot active"></div>
+                                    <div class="signal-dot active"></div>
+                                    <div class="signal-dot"></div>
+                                    <div class="signal-dot"></div>
+                                </div>
+                            </td>
+                            <td>¥13.15</td>
+                            <td>已执行</td>
+                            <td>成交1000股</td>
+                        </tr>
+                        <tr>
+                            <td>14:30:42</td>
+                            <td>600036</td>
+                            <td>卖出</td>
+                            <td>
+                                <div class="signal-strength">
+                                    <div class="signal-dot active"></div>
+                                    <div class="signal-dot active"></div>
+                                    <div class="signal-dot active"></div>
+                                    <div class="signal-dot active"></div>
+                                    <div class="signal-dot"></div>
+                                </div>
+                            </td>
+                            <td>¥47.20</td>
+                            <td>已执行</td>
+                            <td>成交500股</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 策略管理页面 -->
+        <div id="strategy" class="tab-content">
+            <div class="control-panel">
+                <div class="strategy-info">
+                    <h2>🎯 策略管理中心</h2>
+                    <span>管理和监控所有量化策略</span>
+                </div>
+                <div class="control-buttons">
+                    <button class="btn btn-primary" onclick="createStrategy()">新建策略</button>
+                    <button class="btn btn-secondary" onclick="importStrategy()">导入策略</button>
+                    <button class="btn btn-secondary" onclick="exportStrategies()">批量导出</button>
+                </div>
+            </div>
+
+            <!-- 策略概览卡片 -->
+            <div class="strategy-cards-grid">
+                <div class="strategy-card active" data-strategy="momentum">
+                    <div class="strategy-header">
+                        <h3>动量策略 v2.1</h3>
+                        <div class="strategy-status running">●运行中</div>
+                    </div>
+                    <div class="strategy-metrics">
+                        <div class="metric">
+                            <span class="label">收益率:</span>
+                            <span class="value positive">+5.2%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="label">胜率:</span>
+                            <span class="value">65.2%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="label">最大回撤:</span>
+                            <span class="value">-2.1%</span>
+                        </div>
+                    </div>
+                    <div class="strategy-actions">
+                        <button class="btn btn-secondary action-btn" onclick="editStrategy('momentum')">编辑</button>
+                        <button class="btn btn-danger action-btn" onclick="stopStrategy('momentum')">停止</button>
+                        <button class="btn btn-primary action-btn" onclick="viewDetails('momentum')">详情</button>
+                    </div>
+                </div>
+
+                <div class="strategy-card" data-strategy="ml">
+                    <div class="strategy-header">
+                        <h3>机器学习策略 v1.8</h3>
+                        <div class="strategy-status stopped">○已停止</div>
+                    </div>
+                    <div class="strategy-metrics">
+                        <div class="metric">
+                            <span class="label">收益率:</span>
+                            <span class="value positive">+3.1%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="label">胜率:</span>
+                            <span class="value">58.7%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="label">最大回撤:</span>
+                            <span class="value">-3.5%</span>
+                        </div>
+                    </div>
+                    <div class="strategy-actions">
+                        <button class="btn btn-secondary action-btn" onclick="editStrategy('ml')">编辑</button>
+                        <button class="btn btn-primary action-btn" onclick="startStrategy('ml')">启动</button>
+                        <button class="btn btn-primary action-btn" onclick="viewDetails('ml')">详情</button>
+                    </div>
+                </div>
+
+                <div class="strategy-card" data-strategy="custom">
+                    <div class="strategy-header">
+                        <h3>自定义策略 v1.0</h3>
+                        <div class="strategy-status running">●运行中</div>
+                    </div>
+                    <div class="strategy-metrics">
+                        <div class="metric">
+                            <span class="label">收益率:</span>
+                            <span class="value positive">+7.8%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="label">胜率:</span>
+                            <span class="value">72.3%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="label">最大回撤:</span>
+                            <span class="value">-1.8%</span>
+                        </div>
+                    </div>
+                    <div class="strategy-actions">
+                        <button class="btn btn-secondary action-btn" onclick="editStrategy('custom')">编辑</button>
+                        <button class="btn btn-danger action-btn" onclick="stopStrategy('custom')">停止</button>
+                        <button class="btn btn-primary action-btn" onclick="viewDetails('custom')">详情</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 策略详细配置面板 -->
+            <div class="strategy-detail-panel" id="strategyDetailPanel">
+                <div class="panel-header">
+                    <h3 id="strategyDetailTitle">动量策略详细配置</h3>
+                    <button class="btn btn-secondary" onclick="closeDetailPanel()">关闭</button>
+                </div>
+
+                <div class="panel-tabs">
+                    <button class="panel-tab active" onclick="showPanelTab('params')">参数设置</button>
+                    <button class="panel-tab" onclick="showPanelTab('risk')">风险控制</button>
+                    <button class="panel-tab" onclick="showPanelTab('logs')">执行日志</button>
+                    <button class="panel-tab" onclick="showPanelTab('performance')">性能分析</button>
+                </div>
+
+                <div class="panel-content">
+                    <div id="params" class="panel-tab-content active">
+                        <div class="param-grid">
+                            <div class="param-group">
+                                <label>动量周期 (天)</label>
+                                <input type="number" value="20" min="5" max="60">
+                            </div>
+                            <div class="param-group">
+                                <label>买入阈值 (%)</label>
+                                <input type="number" value="5.0" min="1.0" max="20.0" step="0.1">
+                            </div>
+                            <div class="param-group">
+                                <label>卖出阈值 (%)</label>
+                                <input type="number" value="-3.0" min="-20.0" max="-1.0" step="0.1">
+                            </div>
+                            <div class="param-group">
+                                <label>最大持仓数</label>
+                                <input type="number" value="10" min="1" max="50">
+                            </div>
+                            <div class="param-group">
+                                <label>单股最大仓位 (%)</label>
+                                <input type="number" value="10.0" min="1.0" max="50.0" step="0.1">
+                            </div>
+                            <div class="param-group">
+                                <label>最小交易金额</label>
+                                <input type="number" value="10000" min="1000" max="100000" step="1000">
+                            </div>
+                        </div>
+                        <div class="param-actions">
+                            <button class="btn btn-primary" onclick="saveParams()">保存参数</button>
+                            <button class="btn btn-secondary" onclick="resetParams()">重置</button>
+                            <button class="btn btn-secondary" onclick="testParams()">参数测试</button>
+                        </div>
+                    </div>
+
+                    <div id="risk" class="panel-tab-content">
+                        <div class="param-grid">
+                            <div class="param-group">
+                                <label>止损比例 (%)</label>
+                                <input type="number" value="5.0" min="1.0" max="20.0" step="0.1">
+                            </div>
+                            <div class="param-group">
+                                <label>止盈比例 (%)</label>
+                                <input type="number" value="15.0" min="5.0" max="50.0" step="0.1">
+                            </div>
+                            <div class="param-group">
+                                <label>最大回撤限制 (%)</label>
+                                <input type="number" value="10.0" min="5.0" max="30.0" step="0.1">
+                            </div>
+                            <div class="param-group">
+                                <label>总仓位限制 (%)</label>
+                                <input type="number" value="80.0" min="10.0" max="100.0" step="1.0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="logs" class="panel-tab-content">
+                        <div class="log-container">
+                            <div class="log-entry">
+                                <span class="log-time">14:32:15</span>
+                                <span class="log-level info">INFO</span>
+                                <span class="log-message">策略启动成功，开始监控市场数据</span>
+                            </div>
+                            <div class="log-entry">
+                                <span class="log-time">14:30:42</span>
+                                <span class="log-level success">SUCCESS</span>
+                                <span class="log-message">买入信号: 000001 平安银行，价格: 13.15</span>
+                            </div>
+                            <div class="log-entry">
+                                <span class="log-time">14:28:33</span>
+                                <span class="log-level warning">WARNING</span>
+                                <span class="log-message">000002 万科A 价格波动异常，暂停交易</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="performance" class="panel-tab-content">
+                        <div class="performance-metrics">
+                            <div class="metric-card">
+                                <div class="metric-value">+5.23%</div>
+                                <div class="metric-label">总收益率</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">1.85</div>
+                                <div class="metric-label">夏普比率</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">-2.1%</div>
+                                <div class="metric-label">最大回撤</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">65.2%</div>
+                                <div class="metric-label">胜率</div>
+                            </div>
+                        </div>
+                        <div class="chart-placeholder">📊 策略性能分析图表</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 账户表现页面 -->
+        <div id="account" class="tab-content">
+            <div class="account-header">
+                <div class="account-summary">
+                    <h2>📈 账户表现分析</h2>
+                    <div class="account-overview">
+                        <div class="overview-item">
+                            <span class="label">总资产</span>
+                            <span class="value">¥105,234</span>
+                        </div>
+                        <div class="overview-item">
+                            <span class="label">累计收益</span>
+                            <span class="value positive">+¥5,234</span>
+                        </div>
+                        <div class="overview-item">
+                            <span class="label">累计收益率</span>
+                            <span class="value positive">+5.23%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="time-selector">
+                    <button class="time-btn" onclick="switchTimeFrame('day')">日</button>
+                    <button class="time-btn active" onclick="switchTimeFrame('week')">周</button>
+                    <button class="time-btn" onclick="switchTimeFrame('month')">月</button>
+                    <button class="time-btn" onclick="switchTimeFrame('year')">年</button>
+                </div>
+            </div>
+
+            <!-- 收益曲线图 -->
+            <div class="performance-chart-container">
+                <div class="chart-header">
+                    <h3>收益率曲线</h3>
+                    <div class="chart-controls">
+                        <button class="chart-control-btn active" onclick="toggleChart('return')">收益率</button>
+                        <button class="chart-control-btn" onclick="toggleChart('asset')">资产净值</button>
+                        <button class="chart-control-btn" onclick="toggleChart('drawdown')">回撤</button>
+                    </div>
+                </div>
+                <div class="chart-placeholder" id="performanceChart">
+                    📊 收益率曲线图 (可切换显示收益率/资产净值/回撤曲线)
+                </div>
+            </div>
+
+            <!-- 统计数据面板 -->
+            <div class="stats-panel">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-content">
+                            <div class="stat-label">最大收益</div>
+                            <div class="stat-value positive" id="maxReturn">+8.45%</div>
+                            <div class="stat-date">2024-01-15</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">📉</div>
+                        <div class="stat-content">
+                            <div class="stat-label">最大回撤</div>
+                            <div class="stat-value negative" id="maxDrawdown">-2.15%</div>
+                            <div class="stat-date">2024-01-12</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-content">
+                            <div class="stat-label">胜率</div>
+                            <div class="stat-value" id="winRateDetail">65.2%</div>
+                            <div class="stat-date">23胜/12负</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">⚡</div>
+                        <div class="stat-content">
+                            <div class="stat-label">夏普比率</div>
+                            <div class="stat-value" id="sharpeRatio">1.85</div>
+                            <div class="stat-date">风险调整收益</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-label">波动率</div>
+                            <div class="stat-value" id="volatility">12.5%</div>
+                            <div class="stat-date">年化波动率</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🔄</div>
+                        <div class="stat-content">
+                            <div class="stat-label">交易次数</div>
+                            <div class="stat-value" id="tradeCount">156</div>
+                            <div class="stat-date">本周期内</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 收益明细表格 -->
+            <div class="returns-detail-table">
+                <div class="table-header">
+                    <h3>📋 收益明细 (<span id="currentTimeFrame">周</span>)</h3>
+                    <div class="table-controls">
+                        <button class="table-control-btn" onclick="exportData()">导出数据</button>
+                        <button class="table-control-btn" onclick="refreshData()">刷新</button>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>期初资产</th>
+                            <th>期末资产</th>
+                            <th>收益金额</th>
+                            <th>收益率</th>
+                            <th>累计收益率</th>
+                            <th>最大回撤</th>
+                            <th>交易次数</th>
+                        </tr>
+                    </thead>
+                    <tbody id="returnsTableBody">
+                        <tr>
+                            <td>2024年第3周</td>
+                            <td>¥102,150</td>
+                            <td>¥105,234</td>
+                            <td class="positive">+¥3,084</td>
+                            <td class="positive">+3.02%</td>
+                            <td class="positive">+5.23%</td>
+                            <td class="negative">-0.85%</td>
+                            <td>23</td>
+                        </tr>
+                        <tr>
+                            <td>2024年第2周</td>
+                            <td>¥100,890</td>
+                            <td>¥102,150</td>
+                            <td class="positive">+¥1,260</td>
+                            <td class="positive">+1.25%</td>
+                            <td class="positive">+2.15%</td>
+                            <td class="negative">-1.20%</td>
+                            <td>18</td>
+                        </tr>
+                        <tr>
+                            <td>2024年第1周</td>
+                            <td>¥100,000</td>
+                            <td>¥100,890</td>
+                            <td class="positive">+¥890</td>
+                            <td class="positive">+0.89%</td>
+                            <td class="positive">+0.89%</td>
+                            <td class="negative">-0.45%</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <td>2023年第52周</td>
+                            <td>¥101,200</td>
+                            <td>¥100,000</td>
+                            <td class="negative">-¥1,200</td>
+                            <td class="negative">-1.19%</td>
+                            <td class="neutral">0.00%</td>
+                            <td class="negative">-2.15%</td>
+                            <td>12</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 基准对比 -->
+            <div class="benchmark-comparison">
+                <div class="comparison-header">
+                    <h3>📊 基准对比分析</h3>
+                    <div class="benchmark-selector">
+                        <select id="benchmarkSelect" onchange="changeBenchmark()">
+                            <option value="sh">上证指数</option>
+                            <option value="hs300">沪深300</option>
+                            <option value="sz">深证成指</option>
+                            <option value="cyb">创业板指</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="comparison-metrics">
+                    <div class="comparison-item">
+                        <div class="metric-name">累计收益率</div>
+                        <div class="metric-comparison">
+                            <span class="account-metric positive">+5.23%</span>
+                            <span class="vs-text">vs</span>
+                            <span class="benchmark-metric positive">+2.15%</span>
+                            <span class="outperform-badge">超额 +3.08%</span>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="metric-name">最大回撤</div>
+                        <div class="metric-comparison">
+                            <span class="account-metric negative">-2.15%</span>
+                            <span class="vs-text">vs</span>
+                            <span class="benchmark-metric negative">-5.80%</span>
+                            <span class="outperform-badge">控制更好 +3.65%</span>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="metric-name">夏普比率</div>
+                        <div class="metric-comparison">
+                            <span class="account-metric">1.85</span>
+                            <span class="vs-text">vs</span>
+                            <span class="benchmark-metric">0.92</span>
+                            <span class="outperform-badge">表现更优 +0.93</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="backtest" class="tab-content">
+            <h2>🔄 回测分析</h2>
+            <p>回测任务管理、结果分析、报告生成功能...</p>
+        </div>
+
+        <div id="data" class="tab-content">
+            <h2>📈 数据管理</h2>
+            <p>数据源配置、实时数据监控、质量检查功能...</p>
+        </div>
+
+        <div id="monitor" class="tab-content">
+            <h2>📡 实时监控</h2>
+            <p>市场监控、风险预警、异常检测功能...</p>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">
+        <span id="notificationText"></span>
+    </div>
+
+    <script>
+        // 页面切换功能
+        function showTab(tabName) {
+            // 隐藏所有标签页
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的标签页
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 策略控制功能
+        function pauseStrategy() {
+            showNotification('策略已暂停');
+            document.querySelector('.status-indicator').style.background = '#ff9800';
+        }
+
+        function stopStrategy() {
+            showNotification('策略已停止');
+            document.querySelector('.status-indicator').style.background = '#f44336';
+        }
+
+        function showSettings() {
+            showNotification('策略设置面板已打开');
+        }
+
+        // 交易操作
+        function sellStock(symbol) {
+            showNotification(`已提交 ${symbol} 卖出订单`);
+        }
+
+        // 通知功能
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const text = document.getElementById('notificationText');
+            text.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // 模拟实时数据更新
+        function updateRealTimeData() {
+            // 更新运行时间
+            const runtime = document.getElementById('runtime');
+            if (runtime) {
+                let time = runtime.textContent.split(':');
+                let seconds = parseInt(time[2]) + 1;
+                if (seconds >= 60) {
+                    seconds = 0;
+                    let minutes = parseInt(time[1]) + 1;
+                    if (minutes >= 60) {
+                        minutes = 0;
+                        time[0] = String(parseInt(time[0]) + 1).padStart(2, '0');
+                    }
+                    time[1] = String(minutes).padStart(2, '0');
+                }
+                time[2] = String(seconds).padStart(2, '0');
+                runtime.textContent = time.join(':');
+            }
+
+            // 模拟资产数据波动 (基于10万本金)
+            const totalAssets = document.getElementById('totalAssets');
+            if (totalAssets) {
+                const currentValue = parseFloat(totalAssets.textContent.replace(/[¥,]/g, ''));
+                const change = (Math.random() - 0.5) * 100; // 减小波动幅度
+                const newValue = Math.max(90000, currentValue + change); // 最低9万
+                totalAssets.textContent = `¥${newValue.toLocaleString()}`;
+
+                // 更新盈亏 (基于10万本金)
+                const pnl = newValue - 100000;
+                const pnlPercent = (pnl / 100000 * 100).toFixed(2);
+                const todayPnL = document.getElementById('todayPnL');
+                const todayChange = document.getElementById('todayChange');
+                const totalChange = document.getElementById('totalChange');
+
+                if (todayPnL) {
+                    todayPnL.textContent = `${pnl >= 0 ? '+' : ''}¥${Math.abs(pnl).toLocaleString()}`;
+                    todayPnL.className = `metric-value ${pnl >= 0 ? 'positive' : 'negative'}`;
+                }
+                if (todayChange) {
+                    todayChange.textContent = `(${pnl >= 0 ? '+' : ''}${pnlPercent}%)`;
+                    todayChange.className = `metric-change ${pnl >= 0 ? 'positive' : 'negative'}`;
+                }
+                if (totalChange) {
+                    totalChange.textContent = `(${pnl >= 0 ? '+' : ''}${pnlPercent}%)`;
+                    totalChange.className = `metric-change ${pnl >= 0 ? 'positive' : 'negative'}`;
+                }
+            }
+
+            // 更新大盘数据
+            updateMarketData();
+
+            // 更新市场时间
+            const marketTime = document.getElementById('marketTime');
+            if (marketTime) {
+                const now = new Date();
+                marketTime.textContent = now.toLocaleString('zh-CN');
+            }
+        }
+
+        // 更新大盘数据
+        function updateMarketData() {
+            // 上证指数
+            updateIndexData('shIndex', 'shChange', 'shPercent', 2956.85, 0.3);
+
+            // 沪深300
+            updateIndexData('hs300Index', 'hs300Change', 'hs300Percent', 3456.78, 0.4);
+
+            // 深证成指
+            updateIndexData('szIndex', 'szChange', 'szPercent', 9234.56, 0.2);
+
+            // 创业板指
+            updateIndexData('cybIndex', 'cybChange', 'cybPercent', 2123.45, 0.5);
+
+            // 更新涨跌股票数量
+            updateMarketStats();
+        }
+
+        // 更新指数数据
+        function updateIndexData(indexId, changeId, percentId, baseValue, volatility) {
+            const indexElement = document.getElementById(indexId);
+            const changeElement = document.getElementById(changeId);
+            const percentElement = document.getElementById(percentId);
+
+            if (indexElement && changeElement && percentElement) {
+                const currentValue = parseFloat(indexElement.textContent);
+                const change = (Math.random() - 0.5) * volatility * 2;
+                const newValue = currentValue + change;
+                const totalChange = newValue - baseValue;
+                const percentChange = (totalChange / baseValue * 100).toFixed(2);
+
+                indexElement.textContent = newValue.toFixed(2);
+                changeElement.textContent = `${totalChange >= 0 ? '+' : ''}${totalChange.toFixed(2)}`;
+                percentElement.textContent = `(${totalChange >= 0 ? '+' : ''}${percentChange}%)`;
+
+                // 更新颜色
+                const isPositive = totalChange >= 0;
+                changeElement.className = `change-value ${isPositive ? 'positive' : 'negative'}`;
+                percentElement.className = `change-percent ${isPositive ? 'positive' : 'negative'}`;
+            }
+        }
+
+        // 更新市场统计数据
+        function updateMarketStats() {
+            const stats = [
+                { id: 'riseCount', base: 1856, range: 50 },
+                { id: 'fallCount', base: 1234, range: 40 },
+                { id: 'flatCount', base: 456, range: 20 },
+                { id: 'limitUpCount', base: 23, range: 5 },
+                { id: 'limitDownCount', base: 8, range: 3 }
+            ];
+
+            stats.forEach(stat => {
+                const element = document.getElementById(stat.id);
+                if (element) {
+                    const change = Math.floor((Math.random() - 0.5) * stat.range);
+                    const newValue = Math.max(0, stat.base + change);
+                    element.textContent = newValue.toLocaleString();
+                }
+            });
+
+            // 更新成交额
+            const volumeElement = document.getElementById('totalVolume');
+            if (volumeElement) {
+                const baseVolume = 2456;
+                const change = (Math.random() - 0.5) * 100;
+                const newVolume = Math.max(2000, baseVolume + change);
+                volumeElement.textContent = `${newVolume.toFixed(0)}亿`;
+            }
+        }
+
+        // 启动实时数据更新
+        setInterval(updateRealTimeData, 1000);
+
+        // 策略管理功能
+        function createStrategy() {
+            showNotification('新建策略向导已打开');
+        }
+
+        function importStrategy() {
+            showNotification('策略导入功能已启动');
+        }
+
+        function exportStrategies() {
+            showNotification('策略导出功能已启动');
+        }
+
+        function editStrategy(strategyId) {
+            showNotification(`正在编辑${strategyId}策略`);
+            showDetailPanel(strategyId);
+        }
+
+        function startStrategy(strategyId) {
+            showNotification(`${strategyId}策略已启动`);
+            // 更新策略状态
+            const card = document.querySelector(`[data-strategy="${strategyId}"]`);
+            const status = card.querySelector('.strategy-status');
+            status.textContent = '●运行中';
+            status.className = 'strategy-status running';
+        }
+
+        function stopStrategy(strategyId) {
+            showNotification(`${strategyId}策略已停止`);
+            // 更新策略状态
+            const card = document.querySelector(`[data-strategy="${strategyId}"]`);
+            const status = card.querySelector('.strategy-status');
+            status.textContent = '○已停止';
+            status.className = 'strategy-status stopped';
+        }
+
+        function viewDetails(strategyId) {
+            showDetailPanel(strategyId);
+        }
+
+        function showDetailPanel(strategyId) {
+            const panel = document.getElementById('strategyDetailPanel');
+            const title = document.getElementById('strategyDetailTitle');
+
+            // 设置标题
+            const strategyNames = {
+                'momentum': '动量策略',
+                'ml': '机器学习策略',
+                'custom': '自定义策略'
+            };
+            title.textContent = `${strategyNames[strategyId] || strategyId}详细配置`;
+
+            // 显示面板
+            panel.classList.add('show');
+
+            // 高亮选中的策略卡片
+            document.querySelectorAll('.strategy-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector(`[data-strategy="${strategyId}"]`).classList.add('active');
+
+            showNotification(`${strategyNames[strategyId]}详情面板已打开`);
+        }
+
+        function closeDetailPanel() {
+            document.getElementById('strategyDetailPanel').classList.remove('show');
+            document.querySelectorAll('.strategy-card').forEach(card => {
+                card.classList.remove('active');
+            });
+        }
+
+        function showPanelTab(tabName) {
+            // 隐藏所有标签页内容
+            document.querySelectorAll('.panel-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.panel-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // 显示选中的标签页
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function saveParams() {
+            showNotification('策略参数已保存');
+        }
+
+        function resetParams() {
+            showNotification('策略参数已重置为默认值');
+        }
+
+        function testParams() {
+            showNotification('参数测试已启动，请查看测试结果');
+        }
+
+        // 账户表现页面功能
+        let currentTimeFrame = 'week';
+
+        function switchTimeFrame(timeFrame) {
+            currentTimeFrame = timeFrame;
+
+            // 更新按钮状态
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 更新表格标题
+            const timeFrameNames = {
+                'day': '日',
+                'week': '周',
+                'month': '月',
+                'year': '年'
+            };
+            document.getElementById('currentTimeFrame').textContent = timeFrameNames[timeFrame];
+
+            // 更新表格数据
+            updateReturnsTable(timeFrame);
+
+            showNotification(`已切换到${timeFrameNames[timeFrame]}度统计`);
+        }
+
+        function updateReturnsTable(timeFrame) {
+            const tableBody = document.getElementById('returnsTableBody');
+            if (!tableBody) return;
+
+            // 模拟不同时间周期的数据
+            const data = {
+                'day': [
+                    ['2024-01-16', '¥104,890', '¥105,234', '+¥344', '+0.33%', '+5.23%', '-0.12%', '3'],
+                    ['2024-01-15', '¥103,200', '¥104,890', '+¥1,690', '+1.64%', '+4.89%', '-0.25%', '5'],
+                    ['2024-01-12', '¥102,150', '¥103,200', '+¥1,050', '+1.03%', '+3.20%', '-0.45%', '4'],
+                    ['2024-01-11', '¥101,500', '¥102,150', '+¥650', '+0.64%', '+2.15%', '-0.18%', '2']
+                ],
+                'week': [
+                    ['2024年第3周', '¥102,150', '¥105,234', '+¥3,084', '+3.02%', '+5.23%', '-0.85%', '23'],
+                    ['2024年第2周', '¥100,890', '¥102,150', '+¥1,260', '+1.25%', '+2.15%', '-1.20%', '18'],
+                    ['2024年第1周', '¥100,000', '¥100,890', '+¥890', '+0.89%', '+0.89%', '-0.45%', '15'],
+                    ['2023年第52周', '¥101,200', '¥100,000', '-¥1,200', '-1.19%', '0.00%', '-2.15%', '12']
+                ],
+                'month': [
+                    ['2024年1月', '¥100,000', '¥105,234', '+¥5,234', '+5.23%', '+5.23%', '-2.15%', '56'],
+                    ['2023年12月', '¥98,500', '¥100,000', '+¥1,500', '+1.52%', '0.00%', '-3.20%', '42'],
+                    ['2023年11月', '¥102,300', '¥98,500', '-¥3,800', '-3.71%', '-1.50%', '-4.80%', '38'],
+                    ['2023年10月', '¥100,000', '¥102,300', '+¥2,300', '+2.30%', '+2.30%', '-1.85%', '45']
+                ],
+                'year': [
+                    ['2024年', '¥100,000', '¥105,234', '+¥5,234', '+5.23%', '+5.23%', '-2.15%', '56'],
+                    ['2023年', '¥95,000', '¥100,000', '+¥5,000', '+5.26%', '0.00%', '-8.50%', '234'],
+                    ['2022年', '¥100,000', '¥95,000', '-¥5,000', '-5.00%', '-5.00%', '-12.30%', '189'],
+                    ['2021年', '¥90,000', '¥100,000', '+¥10,000', '+11.11%', '0.00%', '-6.80%', '156']
+                ]
+            };
+
+            const currentData = data[timeFrame] || data['week'];
+
+            tableBody.innerHTML = currentData.map(row => `
+                <tr>
+                    <td>${row[0]}</td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td class="${row[3].startsWith('+') ? 'positive' : 'negative'}">${row[3]}</td>
+                    <td class="${row[4].startsWith('+') ? 'positive' : 'negative'}">${row[4]}</td>
+                    <td class="${row[5].startsWith('+') ? 'positive' : row[5] === '0.00%' ? 'neutral' : 'negative'}">${row[5]}</td>
+                    <td class="negative">${row[6]}</td>
+                    <td>${row[7]}</td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleChart(chartType) {
+            // 更新按钮状态
+            document.querySelectorAll('.chart-control-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 更新图表内容
+            const chart = document.getElementById('performanceChart');
+            const chartTypes = {
+                'return': '📊 收益率曲线图 (显示策略收益率变化)',
+                'asset': '📈 资产净值曲线图 (显示资产价值变化)',
+                'drawdown': '📉 回撤曲线图 (显示最大回撤变化)'
+            };
+
+            if (chart) {
+                chart.textContent = chartTypes[chartType] || chartTypes['return'];
+            }
+
+            showNotification(`已切换到${chartType === 'return' ? '收益率' : chartType === 'asset' ? '资产净值' : '回撤'}曲线`);
+        }
+
+        function exportData() {
+            showNotification('数据导出功能已启动，正在生成Excel文件...');
+        }
+
+        function refreshData() {
+            showNotification('数据已刷新');
+            updateReturnsTable(currentTimeFrame);
+        }
+
+        function changeBenchmark() {
+            const select = document.getElementById('benchmarkSelect');
+            const benchmarkNames = {
+                'sh': '上证指数',
+                'hs300': '沪深300',
+                'sz': '深证成指',
+                'cyb': '创业板指'
+            };
+
+            showNotification(`基准已切换为${benchmarkNames[select.value]}`);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            showNotification('模拟实盘交易系统已启动');
+        });
+    </script>
+</body>
+</html>

@@ -9,7 +9,7 @@ python-multipart==0.0.6
 sqlalchemy==2.0.23
 alembic==1.12.1
 psycopg2-binary==2.9.9  # PostgreSQL支持
-sqlite3  # SQLite支持（Python内置）
+# sqlite3 是Python内置模块，不需要安装
 
 # 数据验证和序列化
 pydantic==2.5.0

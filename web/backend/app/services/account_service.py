@@ -216,3 +216,53 @@ class AccountService:
         except Exception as e:
             logger.error(f"更新账户表现失败: {e}")
             raise
+
+    async def get_account_summary(self, account_id: int) -> AccountSummary:
+        """获取账户概览信息"""
+        try:
+            # 获取账户信息
+            account = self.db.query(SimulatedAccount).filter(
+                SimulatedAccount.id == account_id
+            ).first()
+
+            if not account:
+                raise ValueError("账户不存在")
+
+            # 获取持仓数量
+            position_count = self.db.query(SimulatedPosition).filter(
+                SimulatedPosition.account_id == account_id
+            ).count()
+
+            # 计算仓位比例
+            position_ratio = 0.0
+            if account.total_asset > 0:
+                position_ratio = (account.total_market_value / account.total_asset) * 100
+
+            # 获取交易统计
+            total_trades = account.total_trades or 0
+            win_trades = account.win_trades or 0
+            win_rate = account.win_rate or 0.0
+
+            # 构建概览数据
+            return AccountSummary(
+                account_id=account.id,
+                account_name=account.name,
+                total_asset=account.total_asset or 0.0,
+                total_profit=account.total_profit or 0.0,
+                total_return_rate=account.total_return_rate or 0.0,
+                today_profit=account.today_profit or 0.0,
+                today_return_rate=account.today_return_rate or 0.0,
+                position_count=position_count,
+                position_ratio=position_ratio,
+                total_trades=total_trades,
+                win_trades=win_trades,
+                win_rate=win_rate,
+                max_drawdown=account.max_drawdown or 0.0,
+                sharpe_ratio=account.sharpe_ratio or 0.0,
+                status=account.status or "active",
+                last_update=account.updated_at or account.created_at
+            )
+
+        except Exception as e:
+            logger.error(f"获取账户概览失败: {e}")
+            raise
