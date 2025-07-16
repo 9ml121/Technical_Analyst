@@ -1,0 +1,59 @@
+# Web界面后端依赖
+
+# FastAPI核心
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# 数据库
+sqlalchemy==2.0.23
+alembic==1.12.1
+psycopg2-binary==2.9.9  # PostgreSQL支持
+sqlite3  # SQLite支持（Python内置）
+
+# 数据验证和序列化
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# 缓存和消息队列
+redis==5.0.1
+celery==5.3.4
+
+# HTTP客户端
+httpx==0.25.2
+aiohttp==3.9.1
+
+# 数据处理
+pandas==2.1.4
+numpy==1.24.4
+
+# 日期时间处理
+python-dateutil==2.8.2
+
+# 安全认证
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# 配置管理
+python-dotenv==1.0.0
+
+# 日志
+loguru==0.7.2
+
+# 测试
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2  # 用于测试API
+
+# 开发工具
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+
+# 数据可视化（可选）
+plotly==5.17.0
+matplotlib==3.8.2
+
+# 文件处理
+openpyxl==3.1.2  # Excel文件支持
