@@ -13,18 +13,29 @@ import threading
 import time
 from functools import lru_cache
 
-try:
-    from .cache import LRUCache
-    from .performance import performance_timer
-    HAS_PERFORMANCE_TOOLS = True
-except ImportError:
-    HAS_PERFORMANCE_TOOLS = False
-    # 提供空的装饰器
+# 使用模块工厂模式导入依赖
 
+
+def _get_dependencies():
+    """获取依赖模块"""
+    try:
+        from quant_system.utils.cache import LRUCache
+        from quant_system.utils.performance import performance_timer
+        return LRUCache, performance_timer
+    except ImportError:
+        return None, None
+
+
+# 获取依赖
+LRUCache, performance_timer = _get_dependencies()
+
+# 如果性能工具不可用，提供空的装饰器
+if not performance_timer:
     def performance_timer(func):
         return func
-    # 简单的LRU缓存实现
 
+# 如果缓存工具不可用，提供简单的LRU缓存实现
+if not LRUCache:
     class LRUCache:
         def __init__(self, max_size=100, ttl=None):
             self.cache = {}
@@ -61,7 +72,7 @@ class ConfigLoader:
 
         # 初始化缓存
         if self.enable_cache:
-            if HAS_PERFORMANCE_TOOLS:
+            if LRUCache:
                 self._cache = LRUCache(max_size=100, ttl=cache_ttl)
                 self._schema_cache = LRUCache(max_size=50, ttl=cache_ttl)
             else:

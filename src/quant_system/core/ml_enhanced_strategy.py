@@ -2,29 +2,39 @@
 机器学习增强的量化交易策略
 整合传统技术分析和机器学习预测，提高选股和交易决策的准确性
 """
-from .feature_extraction import QuantitativeFeatureExtractor
-from quant_system.models.strategy_models import TradingSignal, SignalType
-from quant_system.models.stock_data import StockData
-from sklearn.pipeline import Pipeline
-from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
-from sklearn.model_selection import TimeSeriesSplit, cross_val_score
-from sklearn.feature_selection import SelectKBest, f_regression, RFE
-from sklearn.preprocessing import StandardScaler, RobustScaler
-from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-import numpy as np
-import pandas as pd
-from datetime import datetime, date, timedelta
-from typing import Dict, List, Optional, Tuple, Any
-import logging
-from dataclasses import dataclass
-import joblib
+# 使用模块工厂模式导入依赖
 import warnings
+import joblib
+from dataclasses import dataclass
+import logging
+from typing import Dict, List, Optional, Tuple, Any
+from datetime import datetime, date, timedelta
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.feature_selection import SelectKBest, f_regression, RFE
+from sklearn.model_selection import TimeSeriesSplit, cross_val_score
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+from sklearn.pipeline import Pipeline
+
+
+def _get_dependencies():
+    """获取依赖模块"""
+    try:
+        from quant_system.core.feature_extraction import QuantitativeFeatureExtractor
+        from quant_system.models.strategy_models import TradingSignal, SignalType
+        from quant_system.models.stock_data import StockData
+        return QuantitativeFeatureExtractor, TradingSignal, SignalType, StockData
+    except ImportError:
+        return None, None, None, None
+
+
+# 获取依赖
+QuantitativeFeatureExtractor, TradingSignal, SignalType, StockData = _get_dependencies()
+
 warnings.filterwarnings('ignore')
-
-# 机器学习相关导入
-
-# 项目内部导入
 
 logger = logging.getLogger(__name__)
 

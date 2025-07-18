@@ -16,17 +16,28 @@ from pathlib import Path
 src_path = Path(__file__).parent.parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
-try:
-    from quant_system.utils.performance import performance_timer, performance_context
-    from quant_system.utils.cache import cache_result, cache_manager
-    HAS_PERFORMANCE_TOOLS = True
-except ImportError:
-    HAS_PERFORMANCE_TOOLS = False
-    # 提供空的装饰器
+# 使用模块工厂模式导入依赖
 
+
+def _get_dependencies():
+    """获取依赖模块"""
+    try:
+        from quant_system.utils.performance import performance_timer, performance_context
+        from quant_system.utils.cache import cache_result, cache_manager
+        return performance_timer, performance_context, cache_result, cache_manager
+    except ImportError:
+        return None, None, None, None
+
+
+# 获取依赖
+performance_timer, performance_context, cache_result, cache_manager = _get_dependencies()
+
+# 如果性能工具不可用，提供空的装饰器
+if not performance_timer:
     def performance_timer(func):
         return func
 
+if not cache_result:
     def cache_result(*args, **kwargs):
         def decorator(func):
             return func
@@ -60,7 +71,7 @@ class MarketDataProcessor:
         self.max_workers = max_workers or min(32, (mp.cpu_count() or 1) + 4)
 
         # 获取缓存实例
-        if HAS_PERFORMANCE_TOOLS:
+        if cache_manager:
             self.cache = cache_manager.get_cache('stock_data')
         else:
             self.cache = None

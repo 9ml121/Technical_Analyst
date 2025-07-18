@@ -31,17 +31,21 @@ async def lifespan(app: FastAPI):
     """应用生命周期管理"""
     # 启动时初始化
     logger.info("🚀 启动Technical_Analyst Web服务...")
-    
+
     # 初始化数据库
     await init_db()
     logger.info("✅ 数据库初始化完成")
-    
+
     # 启动实时数据服务
-    # await start_market_data_service()
+    from app.api.endpoints.websocket import start_realtime_data_push
+    import asyncio
+
+    # 在后台启动实时数据推送任务
+    asyncio.create_task(start_realtime_data_push())
     logger.info("✅ 实时数据服务启动")
-    
+
     yield
-    
+
     # 关闭时清理
     logger.info("🛑 关闭Technical_Analyst Web服务...")
 

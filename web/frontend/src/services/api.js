@@ -98,15 +98,80 @@ export class TradingAPI {
     return api.get(`/strategies/${strategyId}/performance`);
   }
 
+  // 交易相关API
+  static async getTrades(accountId = 1, params = {}) {
+    const queryParams = new URLSearchParams({
+      account_id: accountId,
+      ...params
+    });
+    return api.get(`/trades/?${queryParams}`);
+  }
+
+  static async getTradingSignals(params = {}) {
+    const queryParams = new URLSearchParams(params);
+    return api.get(`/trades/signals?${queryParams}`);
+  }
+
+  static async createOrder(orderData) {
+    return api.post('/trades/order', orderData);
+  }
+
+  // 性能分析API
+  static async getAccountPerformance(accountId, timeFrame = 'week') {
+    return api.get(`/performance/account/${accountId}?time_frame=${timeFrame}`);
+  }
+
+  static async getStrategyPerformanceDetail(strategyId, timeFrame = 'week') {
+    return api.get(`/performance/strategy/${strategyId}?time_frame=${timeFrame}`);
+  }
+
+  static async getPerformanceComparison(accountIds, strategyIds = null, timeFrame = 'month') {
+    const params = new URLSearchParams({
+      account_ids: accountIds.join(','),
+      time_frame: timeFrame
+    });
+    if (strategyIds) {
+      params.append('strategy_ids', strategyIds.join(','));
+    }
+    return api.get(`/performance/comparison?${params}`);
+  }
+
+  // WebSocket连接管理
+  static createWebSocketConnection(clientId = 'web_client') {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/api/v1/ws/connect/${clientId}`;
+
+    const ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+      console.log('WebSocket连接已建立');
+      // 订阅市场数据和账户更新
+      ws.send(JSON.stringify({
+        type: 'subscribe',
+        topics: ['market_data', 'account_updates']
+      }));
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket错误:', error);
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket连接已关闭');
+    };
+
+    return ws;
+  }
+
   // WebSocket连接（暂时用轮询模拟）
-  static startRealtimeUpdates(callback, interval = 1000) {
+  static startRealtimeUpdates(callback, interval = 5000) {
     const updateData = async () => {
       try {
         const [accountSummary, marketData] = await Promise.all([
           this.getAccountSummary(),
           this.getRealtimeIndices()
         ]);
-        
+
         callback({
           account: accountSummary,
           market: marketData,
@@ -119,10 +184,10 @@ export class TradingAPI {
 
     // 立即执行一次
     updateData();
-    
+
     // 设置定时更新
     const intervalId = setInterval(updateData, interval);
-    
+
     // 返回清理函数
     return () => clearInterval(intervalId);
   }

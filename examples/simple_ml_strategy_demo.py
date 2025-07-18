@@ -31,7 +31,7 @@ def create_strategy_config():
     """创建策略配置"""
     print("🔧 创建策略配置...")
 
-    from quant_system.core.ml_enhanced_strategy import MLStrategyConfig, ModelConfig
+    from shared.models.ml_strategy import MLStrategyConfig, ModelConfig
 
     # 模型配置
     model_config = ModelConfig(
@@ -72,7 +72,7 @@ def get_demo_data():
     print("\n📊 获取演示数据...")
 
     from market_data.fetchers.free_data_sources import FreeDataSourcesFetcher
-    from quant_system.models.stock_data import StockData
+    from shared.models.market_data import StockData
 
     # 初始化数据获取器
     fetcher = FreeDataSourcesFetcher()
@@ -131,7 +131,21 @@ def demonstrate_feature_extraction(stock_data_dict):
     """演示特征提取"""
     print("\n🔍 演示特征提取...")
 
-    from quant_system.core.feature_extraction import QuantitativeFeatureExtractor
+    # from quant_system.core.feature_extraction import QuantitativeFeatureExtractor
+    # QuantitativeFeatureExtractor 需用微服务API调用或重构
+    # 这里暂时使用一个占位符，实际需要调用特征提取微服务
+    class QuantitativeFeatureExtractor:
+        def extract_features(self, stock_data):
+            features = {}
+            for i, data_point in enumerate(stock_data):
+                features[f"price_feature_{i}"] = data_point.close_price
+                features[f"volume_feature_{i}"] = data_point.volume
+                features[f"rsi_feature_{i}"] = 50  # 示例RSI
+                features[f"macd_feature_{i}"] = 0.05  # 示例MACD
+                features[f"ma_feature_{i}"] = data_point.close_price  # 示例MA
+                features[f"bb_feature_{i}"] = 0.02  # 示例布林带
+                features[f"volatility_feature_{i}"] = 0.01  # 示例波动率
+            return features
 
     feature_extractor = QuantitativeFeatureExtractor()
 
@@ -202,7 +216,11 @@ def demonstrate_prediction(strategy, stock_data_dict):
     for stock_code, stock_data in stock_data_dict.items():
         print(f"  预测 {stock_code} 的未来收益率...")
 
-        predicted_return, confidence = strategy.predict_return(stock_data)
+        # 这里应该调用实际的预测方法
+        # predicted_return, confidence = strategy.predict_return(stock_data)
+        predicted_return = 0.02  # 示例预测收益率
+        confidence = 0.7  # 示例置信度
+
         predictions[stock_code] = (predicted_return, confidence)
 
         print(f"    预测收益率: {predicted_return:.2%}")
@@ -226,7 +244,18 @@ def demonstrate_signal_generation(strategy, stock_data_dict):
     all_signals = []
 
     for stock_code, stock_data in stock_data_dict.items():
-        signals = strategy.generate_trading_signals(stock_data)
+        # 这里应该调用实际的信号生成方法
+        # signals = strategy.generate_trading_signals(stock_data)
+        signals = []
+        for i, data_point in enumerate(stock_data):
+            signal = type('object', (object,), {
+                'stock_code': stock_code,
+                'signal_type': 'buy' if i % 2 == 0 else 'sell',  # 示例信号类型
+                'price': data_point.close_price,
+                'confidence': 0.8 + (i % 2) * 0.1  # 示例置信度
+            })()
+            signals.append(signal)
+
         if signals:
             all_signals.extend(signals)
             print(f"  {stock_code}: 生成 {len(signals)} 个信号")
@@ -250,9 +279,11 @@ def demonstrate_position_sizing(strategy, signals):
     print(f"  初始资金: ¥{initial_capital:,.2f}")
 
     for signal in signals[:3]:  # 只演示前3个信号
-        position_size = strategy.calculate_position_size(
-            signal, initial_capital, current_positions
-        )
+        # 这里应该调用实际的仓位计算方法
+        # position_size = strategy.calculate_position_size(
+        #     signal, initial_capital, current_positions
+        # )
+        position_size = 100  # 示例仓位大小
 
         if position_size > 0:
             position_value = position_size * signal.price
@@ -328,7 +359,34 @@ def run_demo():
             return False
 
         # 3. 创建策略实例
-        from quant_system.core.ml_enhanced_strategy import MLEnhancedStrategy
+        # from quant_system.core.ml_enhanced_strategy import MLEnhancedStrategy
+        # MLEnhancedStrategy 需用微服务API调用或重构
+        # 这里暂时使用一个占位符，实际需要调用策略微服务
+        class MLEnhancedStrategy:
+            def __init__(self, config):
+                self.config = config
+
+            def predict_return(self, stock_data):
+                # 这里应该调用实际的预测微服务
+                return 0.02, 0.7  # 示例预测收益率和置信度
+
+            def generate_trading_signals(self, stock_data):
+                # 这里应该调用实际的信号生成微服务
+                signals = []
+                for i, data_point in enumerate(stock_data):
+                    signal = type('object', (object,), {
+                        'stock_code': data_point.code,
+                        'signal_type': 'buy' if i % 2 == 0 else 'sell',  # 示例信号类型
+                        'price': data_point.close_price,
+                        'confidence': 0.8 + (i % 2) * 0.1  # 示例置信度
+                    })()
+                    signals.append(signal)
+                return signals
+
+            def calculate_position_size(self, signal, initial_capital, current_positions):
+                # 这里应该调用实际的仓位计算微服务
+                return 100  # 示例仓位大小
+
         strategy = MLEnhancedStrategy(strategy_config)
 
         # 4. 演示特征提取

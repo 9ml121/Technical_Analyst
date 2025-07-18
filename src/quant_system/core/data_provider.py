@@ -26,25 +26,30 @@ except ImportError:
     HAS_NUMPY = False
     print("Warning: numpy not available, some features may be limited")
 
-# 导入数据模型
-try:
-    from ..models.stock_data import StockData, StockDataValidator
-    from ..utils.logger import get_logger
-except ImportError:
-    # 如果相对导入失败，尝试绝对导入
+# 使用模块工厂模式导入依赖
+
+
+def _get_dependencies():
+    """获取依赖模块"""
     try:
+        # 尝试导入数据模型
         from quant_system.models.stock_data import StockData, StockDataValidator
         from quant_system.utils.logger import get_logger
+        return StockData, StockDataValidator, get_logger
     except ImportError:
-        # 如果都失败，使用基础日志
-        StockData = None
-        StockDataValidator = None
-        logger = logging.getLogger(__name__)
-        logging.basicConfig(level=logging.INFO)
-    else:
-        logger = get_logger()
-else:
+        # 如果导入失败，返回None
+        return None, None, None
+
+
+# 获取依赖
+StockData, StockDataValidator, get_logger = _get_dependencies()
+
+# 设置日志
+if get_logger:
     logger = get_logger()
+else:
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.INFO)
 
 
 class HistoricalDataProvider:

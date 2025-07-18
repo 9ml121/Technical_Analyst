@@ -3,21 +3,34 @@
 提取样本股票的量化特征，进行数据建模
 基于最新的多因子选股策略和机器学习方法
 """
-from .data_provider import HistoricalDataProvider
-from quant_system.models.stock_data import StockData
-import numpy as np
-import pandas as pd
-import pandas_ta as ta
-from datetime import datetime, date, timedelta
-from typing import Dict, List, Optional, Tuple, Any
-import logging
-from sklearn.preprocessing import StandardScaler, RobustScaler
-from sklearn.decomposition import PCA
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error, r2_score
+# 使用模块工厂模式导入依赖
 import warnings
-warnings.filterwarnings('ignore')
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler, RobustScaler
+import logging
+from typing import Dict, List, Optional, Tuple, Any
+from datetime import datetime, date, timedelta
+import pandas_ta as ta
+import pandas as pd
+import numpy as np
 
+
+def _get_dependencies():
+    """获取依赖模块"""
+    try:
+        from quant_system.core.data_provider import HistoricalDataProvider
+        from quant_system.models.stock_data import StockData
+        return HistoricalDataProvider, StockData
+    except ImportError:
+        return None, None
+
+
+# 获取依赖
+HistoricalDataProvider, StockData = _get_dependencies()
+
+warnings.filterwarnings('ignore')
 
 logger = logging.getLogger(__name__)
 
@@ -191,8 +204,9 @@ class QuantitativeFeatureExtractor:
                     features[f'rsi_{rsi_len}'] = rsi.iloc[-1]
 
             # MACD（多周期）
-            for fast, slow, signal in [(12,26,9), (5,35,5), (8,21,9)]:
-                macd = ta.macd(df['close'], fast=fast, slow=slow, signal=signal)
+            for fast, slow, signal in [(12, 26, 9), (5, 35, 5), (8, 21, 9)]:
+                macd = ta.macd(df['close'], fast=fast,
+                               slow=slow, signal=signal)
                 if macd is not None and not macd.isnull().values.any():
                     features[f'macd_{fast}_{slow}_{signal}'] = macd[f'MACD_{fast}_{slow}_{signal}'].iloc[-1]
                     features[f'macd_signal_{fast}_{slow}_{signal}'] = macd[f'MACDs_{fast}_{slow}_{signal}'].iloc[-1]
@@ -206,8 +220,10 @@ class QuantitativeFeatureExtractor:
                     middle = bbands[f'BBM_{bb_len}_2.0'].iloc[-1]
                     lower = bbands[f'BBL_{bb_len}_2.0'].iloc[-1]
                     if not np.isnan(upper):
-                        features[f'bb_position_{bb_len}'] = (closes[-1] - lower) / (upper - lower) if (upper - lower) != 0 else 0.5
-                        features[f'bb_width_{bb_len}'] = (upper - lower) / middle if middle != 0 else 0
+                        features[f'bb_position_{bb_len}'] = (
+                            closes[-1] - lower) / (upper - lower) if (upper - lower) != 0 else 0.5
+                        features[f'bb_width_{bb_len}'] = (
+                            upper - lower) / middle if middle != 0 else 0
 
             # WILLR 威廉指标
             willr = ta.willr(df['high'], df['low'], df['close'], length=14)
@@ -220,7 +236,8 @@ class QuantitativeFeatureExtractor:
                 features['cci'] = cci.iloc[-1]
 
             # MFI 资金流量指标
-            mfi = ta.mfi(df['high'], df['low'], df['close'], df['volume'], length=14)
+            mfi = ta.mfi(df['high'], df['low'], df['close'],
+                         df['volume'], length=14)
             if not np.isnan(mfi.iloc[-1]):
                 features['mfi'] = mfi.iloc[-1]
 
@@ -232,9 +249,11 @@ class QuantitativeFeatureExtractor:
 
             # ATR 真实波动幅度（多周期）
             for atr_len in [7, 14, 21]:
-                atr = ta.atr(df['high'], df['low'], df['close'], length=atr_len)
+                atr = ta.atr(df['high'], df['low'],
+                             df['close'], length=atr_len)
                 if not np.isnan(atr.iloc[-1]):
-                    features[f'atr_{atr_len}'] = atr.iloc[-1] / closes[-1] if closes[-1] != 0 else 0
+                    features[f'atr_{atr_len}'] = atr.iloc[-1] / \
+                        closes[-1] if closes[-1] != 0 else 0
 
             # KDJ (STOCH)
             stoch = ta.stoch(df['high'], df['low'], df['close'])
@@ -517,7 +536,18 @@ class QuantitativeFeatureExtractor:
 
 if __name__ == "__main__":
     # 测试特征提取器
-    from .data_provider import HistoricalDataProvider
+    # 使用模块工厂模式导入依赖
+    def _get_dependencies():
+        """获取依赖模块"""
+        try:
+            from quant_system.core.data_provider import HistoricalDataProvider
+            from quant_system.models.stock_data import StockData
+            return HistoricalDataProvider, StockData
+        except ImportError:
+            return None, None
+
+    # 获取依赖
+    HistoricalDataProvider, StockData = _get_dependencies()
 
     print("测试量化特征提取模块...")
 

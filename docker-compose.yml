@@ -1,0 +1,153 @@
+version: "3.8"
+
+services:
+    # PostgreSQL 数据库
+    postgres:
+        image: postgres:15-alpine
+        environment:
+            - POSTGRES_DB=quant_db
+            - POSTGRES_USER=quant_user
+            - POSTGRES_PASSWORD=quant_pass
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - quant-network
+
+    # Redis 缓存
+    redis:
+        image: redis:7-alpine
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+        networks:
+            - quant-network
+
+    # API 网关服务
+    gateway:
+        build:
+            context: ./services/gateway
+            dockerfile: Dockerfile
+        ports:
+            - "8000:8000"
+        environment:
+            - ENVIRONMENT=development
+            - LOG_LEVEL=INFO
+        depends_on:
+            - data-service
+            - core-service
+            - strategy-service
+            - notification-service
+        networks:
+            - quant-network
+        volumes:
+            - ./logs:/app/logs
+
+    # 核心量化服务
+    core-service:
+        build:
+            context: ./services/core-service
+            dockerfile: Dockerfile
+        ports:
+            - "8001:8001"
+        environment:
+            - ENVIRONMENT=development
+            - LOG_LEVEL=INFO
+            - DATABASE_URL=postgresql://quant_user:quant_pass@postgres:5432/quant_db
+        depends_on:
+            - postgres
+            - redis
+        networks:
+            - quant-network
+        volumes:
+            - ./data:/app/data
+            - ./logs:/app/logs
+
+    # 数据获取服务
+    data-service:
+        build:
+            context: ./services/data-service
+            dockerfile: Dockerfile
+        ports:
+            - "8002:8002"
+        environment:
+            - ENVIRONMENT=development
+            - LOG_LEVEL=INFO
+            - DATABASE_URL=postgresql://quant_user:quant_pass@postgres:5432/quant_db
+            - REDIS_URL=redis://redis:6379
+        depends_on:
+            - postgres
+            - redis
+        networks:
+            - quant-network
+        volumes:
+            - ./data:/app/data
+            - ./logs:/app/logs
+
+    # 策略管理服务
+    strategy-service:
+        build:
+            context: ./services/strategy-service
+            dockerfile: Dockerfile
+        ports:
+            - "8003:8003"
+        environment:
+            - ENVIRONMENT=development
+            - LOG_LEVEL=INFO
+            - DATABASE_URL=postgresql://quant_user:quant_pass@postgres:5432/quant_db
+        depends_on:
+            - postgres
+        networks:
+            - quant-network
+        volumes:
+            - ./data:/app/data
+            - ./logs:/app/logs
+
+    # 通知服务
+    notification-service:
+        build:
+            context: ./services/notification-service
+            dockerfile: Dockerfile
+        ports:
+            - "8004:8004"
+        environment:
+            - ENVIRONMENT=development
+            - LOG_LEVEL=INFO
+            - DATABASE_URL=postgresql://quant_user:quant_pass@postgres:5432/quant_db
+        depends_on:
+            - postgres
+        networks:
+            - quant-network
+        volumes:
+            - ./logs:/app/logs
+
+    # Web界面服务
+    web-service:
+        build:
+            context: ./services/web-service
+            dockerfile: Dockerfile
+        ports:
+            - "8005:8000"
+        environment:
+            - ENVIRONMENT=development
+            - LOG_LEVEL=INFO
+            - DATABASE_URL=postgresql://quant_user:quant_pass@postgres:5432/quant_db
+            - REDIS_URL=redis://redis:6379
+        depends_on:
+            - postgres
+            - redis
+            - gateway
+        networks:
+            - quant-network
+        volumes:
+            - ./logs:/app/logs
+
+volumes:
+    postgres_data:
+    redis_data:
+
+networks:
+    quant-network:
+        driver: bridge

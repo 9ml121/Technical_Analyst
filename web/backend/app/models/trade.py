@@ -8,6 +8,10 @@ from sqlalchemy.orm import relationship
 
 from app.core.database import Base
 
+# 为了兼容API端点，添加别名
+Trade = SimulatedTrade
+Position = SimulatedPosition
+
 class SimulatedTrade(Base):
     """模拟交易记录表"""
     __tablename__ = "simulated_trades"
@@ -144,3 +148,95 @@ class TradingSignal(Base):
         self.executed_price = price
         self.executed_quantity = quantity
         self.execution_time = func.now()
+
+class SimulatedPosition(Base):
+    """模拟持仓表"""
+    __tablename__ = "simulated_positions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    account_id = Column(Integer, ForeignKey("simulated_accounts.id"), nullable=False)
+
+    # 持仓基本信息
+    symbol = Column(String(10), nullable=False)  # 股票代码
+    symbol_name = Column(String(50))  # 股票名称
+
+    # 持仓数量和成本
+    quantity = Column(Integer, default=0)  # 持仓数量
+    available_quantity = Column(Integer, default=0)  # 可用数量
+    avg_cost = Column(Float, default=0)  # 平均成本
+    total_cost = Column(Float, default=0)  # 总成本
+
+    # 当前价格和市值
+    current_price = Column(Float, default=0)  # 当前价格
+    market_value = Column(Float, default=0)  # 市值
+
+    # 盈亏信息
+    unrealized_pnl = Column(Float, default=0)  # 浮动盈亏
+    unrealized_pnl_rate = Column(Float, default=0)  # 浮动盈亏率
+    realized_pnl = Column(Float, default=0)  # 已实现盈亏
+
+    # 时间信息
+    first_buy_time = Column(DateTime(timezone=True))  # 首次买入时间
+    last_update_time = Column(DateTime(timezone=True), server_default=func.now())  # 最后更新时间
+
+    # 关联关系
+    account = relationship("SimulatedAccount", back_populates="positions")
+
+    def __repr__(self):
+        return f"<SimulatedPosition(symbol='{self.symbol}', quantity={self.quantity}, avg_cost={self.avg_cost})>"
+
+    def update_market_value(self, current_price: float):
+        """更新市值和盈亏"""
+        self.current_price = current_price
+        self.market_value = self.quantity * current_price
+        self.unrealized_pnl = self.market_value - self.total_cost
+        if self.total_cost > 0:
+            self.unrealized_pnl_rate = (self.unrealized_pnl / self.total_cost) * 100
+        self.last_update_time = func.now()
+
+    def add_position(self, quantity: int, price: float):
+        """增加持仓"""
+        if self.quantity == 0:
+            # 首次买入
+            self.quantity = quantity
+            self.available_quantity = quantity
+            self.avg_cost = price
+            self.total_cost = quantity * price
+            self.first_buy_time = func.now()
+        else:
+            # 加仓
+            new_total_cost = self.total_cost + (quantity * price)
+            new_quantity = self.quantity + quantity
+            self.avg_cost = new_total_cost / new_quantity
+            self.quantity = new_quantity
+            self.available_quantity += quantity
+            self.total_cost = new_total_cost
+
+        self.last_update_time = func.now()
+
+    def reduce_position(self, quantity: int, price: float):
+        """减少持仓"""
+        if quantity > self.available_quantity:
+            raise ValueError("减仓数量超过可用数量")
+
+        # 计算已实现盈亏
+        cost_per_share = self.total_cost / self.quantity
+        realized_pnl = (price - cost_per_share) * quantity
+        self.realized_pnl += realized_pnl
+
+        # 更新持仓
+        self.quantity -= quantity
+        self.available_quantity -= quantity
+        self.total_cost -= cost_per_share * quantity
+
+        if self.quantity == 0:
+            # 清仓
+            self.avg_cost = 0
+            self.total_cost = 0
+
+        self.last_update_time = func.now()
+        return realized_pnl
+
+# 为了兼容API端点，添加别名
+Trade = SimulatedTrade
+Position = SimulatedPosition
